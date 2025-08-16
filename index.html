@@ -616,9 +616,9 @@
       btn.appendChild(ripple);
     }, { passive: true });
 
-    // PDF mejorado
+    // PDF mejorado: toda la sección "total"
     btnPdf.addEventListener('click', async () => {
-      const area = document.getElementById('cotizacionResumen');
+      const area = document.getElementById('total');
       const prevBg = area.style.background;
       const prevFont = area.style.fontFamily;
       area.style.background = '#fff';
@@ -653,9 +653,9 @@
       pdf.save(`cotizacion-montura-${stamp}.pdf`);
     });
 
-    // PNG mejorado
+    // PNG mejorado: toda la sección "total"
     btnPng.addEventListener('click', async () => {
-      const area = document.getElementById('cotizacionResumen');
+      const area = document.getElementById('total');
       const prevBg = area.style.background;
       const prevFont = area.style.fontFamily;
       area.style.background = '#fff';
