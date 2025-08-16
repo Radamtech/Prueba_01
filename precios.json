@@ -1,0 +1,62 @@
+{
+  "tamano": { "basePrice": 0, "normalSizes": [14, 15, 16], "step": 0 },
+  "fuste": {
+    "estilos": { "saldivar": 0, "buchon": 0 },
+    "descuentoClienteManda": 1000
+  },
+  "cueraje": {
+    "cantinas": {
+      "mediano": { "cuadradas": 22000, "redondas": 22000 },
+      "grande":  { "cuadradas": 25000, "redondas": 25000 }
+    },
+    "bastos": {
+      "mediano": { "cuadradas": 22000, "redondas": 22000 },
+      "grande":  { "cuadradas": 25000, "redondas": 25000 }
+    },
+    "esqueleto": { "basto_cuadrado": 20000, "cola_pato": 18000 }
+  },
+  "estribos": { "abierto": 0, "tapadera": 1500 },
+  "cabezada": [
+    { "max": 54,  "price": 0,  "label": "pequeña" },
+    { "max": 60,  "price": 0,  "label": "mediana" },
+    { "max": 999, "price": 0, "label": "grande" }
+  ],
+  "carciones": {
+    "sencilla_recta": 0,
+    "sencilla_sudadera": 0,
+    "doble_recta": 0,
+    "doble_sudadera": 0
+  },
+  "herraje": {
+    "estilos": {
+      "cuero": 0,
+      "cuerno": 3000,
+      "inox_blanco": 3500,
+      "inox_pavonado": 4500,
+      "fierro_aluminio": 9000,
+      "fierro_plata": 0
+    },
+    "argollas_tapa": 1000
+  },
+  "extras": {
+    "cincha": 1200,
+    "jaquima": 2800,
+    "cuarta": 500,
+    "espuelas": 0,
+    "machete": 0,
+    "freno": 0,
+    "cuchillo": 0,
+    "cinturon": 900,
+    "hebilla": 0
+  },
+  "carona": {
+    "cola_pato": 800,
+    "basto_cuadrado": 1000,
+    "mediano": 1200,
+    "grande": 1500
+  },
+  "zarape": {
+    "sencillo": 900,
+    "fino": 3500
+  }
+}

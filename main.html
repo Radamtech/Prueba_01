@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cotizador de Monturas</title>
+  <meta name="description" content="Cotizador de monturas ecuestres con extras. Descarga tu cotización en PDF o PNG y compártela por WhatsApp." />
+  <style>
+    :root {
+      --primary: #c2410c;  /* Orange-600 */
+      --secondary: #f97316;/* Orange-400 */
+      --accent: #eab308;   /* Amber-500 */
+      --bg: #fff7ed;       /* Warm base */
+      --text: #1f2937;     /* Slate-800 */
+      --muted: #6b7280;    /* Slate-500 (neutral-warm) */
+      --card: #ffffff;     /* White */
+      --border: #f1e5d1;   /* Warm sand */
+      --success: #16a34a;  /* Green-600 */
+      --danger: #dc2626;   /* Red-600 */
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      color: var(--text);
+      background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 35%, #fefce8 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main.container {
+      flex: 1 0 auto;
+    }
+    .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+
+    /* Header */
+    .site-header { position: sticky; top: 0; z-index: 50; background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+    .site-header .wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; letter-spacing: .3px; }
+    .brand .logo { width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #fff, #e5e7eb); display: grid; place-items: center; color: var(--primary); font-weight: 900; box-shadow: inset 0 2px 8px rgba(255,255,255,.8), 0 3px 10px rgba(0,0,0,.2); }
+    nav a { color: #fff; text-decoration: none; margin-left: 18px; font-weight: 600; opacity: .95; border-bottom: 2px solid transparent; padding-bottom: 3px; transition: all 160ms ease; }
+    nav a:hover { opacity: 1; border-color: rgba(255,255,255,.9); }
+
+    /* Hero */
+    .hero { padding: 32px 0 10px; }
+    .hero h1 { margin: 0 0 8px; font-size: clamp(1.6rem, 2.4vw + 1rem, 2.4rem); }
+    .hero p { margin: 0; color: var(--muted); }
+
+    /* Layout */
+    .layout { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 22px; align-items: start; }
+    @media (max-width: 1180px) { .layout { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06); overflow: hidden; }
+    .card-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .card-header h2 { margin: 0; font-size: 1.05rem; }
+    .card-body { padding: 16px 18px; }
+
+    .field { margin-bottom: 14px; }
+    .field label.block { display: block; font-weight: 700; margin-bottom: 6px; }
+    .row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+
+    input[type="number"], input[type="text"], select { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; font-size: .98rem; background: #fff; outline: none; transition: border-color 140ms ease, box-shadow 140ms ease; }
+    input:focus, select:focus { border-color: var(--secondary); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.20); }
+    .hint { color: var(--muted); font-size: .92rem; }
+    .error { color: var(--danger); font-size: .9rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 8px 10px; margin-top: 8px; display: none; }
+
+    .subgroup { padding: 10px 12px; border: 1px dashed var(--border); border-radius: 10px; background: #fff; }
+    .option-line { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .option-line:last-child { margin-bottom: 0; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+
+    /* Buttons with enhanced animations */
+    .btn, .btn-outline {
+      position: relative; overflow: hidden; isolation: isolate; appearance: none; border: 0; border-radius: 12px; padding: 12px 18px; font-weight: 800; cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease, filter 160ms ease; will-change: transform;
+    }
+    .btn { color: #0b1020; background: linear-gradient(90deg, #fef9c3, var(--accent), #fef9c3); background-size: 200% 200%; animation: gradientShift 6s ease infinite; box-shadow: 0 6px 18px rgba(245, 158, 11, .35); }
+    .btn:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 10px 26px rgba(245, 158, 11, .45); }
+    .btn:active { transform: translateY(0) scale(.99); }
+
+    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--muted); box-shadow: 0 2px 10px rgba(2, 6, 23, 0.06); }
+    .btn-outline:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12); filter: brightness(1.03); }
+
+    .btn:focus-visible, .btn-outline:focus-visible { outline: none; box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.25), 0 0 0 8px rgba(234, 88, 12, 0.15); }
+
+    .btn .ripple, .btn-outline .ripple { position: absolute; border-radius: 9999px; transform: scale(0); background: rgba(255,255,255,.55); animation: ripple 600ms ease-out; pointer-events: none; mix-blend-mode: screen; }
+
+    @keyframes gradientShift { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* Summary */
+    .resumen .total { font-size: 1.8rem; font-weight: 900; color: var(--primary); margin: 6px 0 2px; }
+    ul.breakdown { list-style: none; padding: 0; margin: 6px 0 0; }
+    ul.breakdown li { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); gap: 8px; }
+    ul.breakdown li:last-child { border-bottom: 0; }
+    .line { height: 1px; background: var(--border); margin: 12px 0; }
+
+    /* Capture area styling */
+    #cotizacionCaptura {
+      padding: 18px 18px 14px;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      background:
+        radial-gradient(1200px 1200px at 100% -10%, rgba(194,65,12,.06), transparent 70%),
+        radial-gradient(1200px 1200px at -10% 100%, rgba(234,88,12,.06), transparent 70%),
+        #fff;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.06), inset 0 0 0 1px rgba(255,255,255,.6);
+    }
+    .quote-header {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px 14px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #fff, #e5e7eb);
+      display: grid;
+      place-items: center;
+      color: var(--primary);
+      font-weight: 900;
+      box-shadow: inset 0 2px 8px rgba(255,255,255,.8), 0 3px 10px rgba(0,0,0,.12);
+    }
+    .quote-title div {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin: 0;
+    }
+    .quote-title small {
+      display: block;
+      color: var(--muted);
+    }
+    .quote-meta {
+      text-align: right;
+      font-size: .92rem;
+      color: var(--muted);
+    }
+    .quote-footer {
+      margin-top: 10px;
+      font-size: .9rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Footer */
+    .site-footer {
+      background: #0b1020;
+      color: #cbd5e1;
+      padding: 22px 0;
+      text-align: center;
+      border-top: 4px solid transparent;
+      border-image: linear-gradient(90deg, var(--primary), var(--secondary)) 1;
+      margin-top: 0;
+      flex-shrink: 0;
+    }
+    .site-footer a { color: #e2e8f0; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container wrap">
+      <div class="brand" aria-label="Marca">
+        <div class="logo" aria-hidden="true">CM</div>
+        <div>
+          <div style="font-size: 1.05rem; line-height: 1;">Cotizador</div>
+          <div style="font-size: .82rem; opacity: .9;">de Monturas</div>
+        </div>
+      </div>
+      <nav aria-label="Navegación principal">
+        <a href="#montura">Montura</a>
+        <a href="#extras">Extras</a>
+        <a href="#total">Total</a>
+        <a href="misionyvision.html">Misión y Visión</a>
+        <a href="redes.html">Redes</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Cotizador de monturas ecuestres</h1>
+      <p>Selecciona opciones y obtén el precio total en pesos mexicanos en tiempo real. Descarga tu cotización en PDF o PNG.</p>
+    </section>
+
+    <section class="layout">
+      <!-- 1) Montura -->
+      <div class="card" id="montura">
+        <div class="card-header">
+          <h2>Montura</h2>
+          <span class="hint">6 mini secciones</span>
+        </div>
+        <div class="card-body">
+          <!-- Tamaño -->
+          <div class="field">
+            <label for="tamano" class="block">1) Tamaño (en pulgadas)</label>
+            <input type="number" id="tamano" min="8" max="22" step="0.5" placeholder="Ej. 14, 14.5, 15, 15.5, 16" value="15" />
+            <div id="tamanoError" class="error">Ingrese solo números válidos. 14, 15 y 16 pulgadas mantienen el precio base; mayor sube el precio y menor lo reduce.</div>
+            <div id="tamanoAviso" class="error" style="display:none;">Tamaño mayor a 16 pulgadas: se clasifica como Trabajo especial y se cotiza por mensaje directo con el artesano.</div>
+            <div class="hint">Base normal: 14 - 16 pulgadas. Más de 16 =&gt; Trabajo especial. Rango permitido: 8 - 22.</div>
+          </div>
+
+          <!-- Fuste -->
+          <div class="field">
+            <label class="block">2) Fuste</label>
+            <div class="subgroup">
+              <div class="row" style="margin-top:6px;">
+                <div>
+                  <label class="block hint" for="fusteEstilo">Estilo</label>
+                  <select id="fusteEstilo">
+                    <option value="saldivar">Saldívar</option>
+                    <option value="buchon">Buchón</option>
+                  </select>
+                </div>
+              </div>
+              <label class="option-line" for="clienteMandaFuste"><input type="checkbox" id="clienteMandaFuste"> El cliente envía su fuste (– MX$1,000)</label>
+              <div id="fusteAviso" class="error" style="display:none;"></div>
+            </div>
+          </div>
+
+          <!-- Cueraje -->
+          <div class="field">
+            <label class="block">3) Cueraje</label>
+            <div class="subgroup">
+              <div class="option-line"><input type="radio" name="cueraje" id="cuerajeCantinas" value="cantinas" checked> <label for="cuerajeCantinas">Cantinas</label></div>
+              <div class="option-line"><input type="radio" name="cueraje" id="cuerajeBastos" value="bastos"> <label for="cuerajeBastos">Bastos</label></div>
+              <div class="option-line"><input type="radio" name="cueraje" id="cuerajeEsqueleto" value="esqueleto"> <label for="cuerajeEsqueleto">Esqueleto</label></div>
+              <div class="option-line"><input type="radio" name="cueraje" id="cuerajeColaPato" value="cola_pato"> <label for="cuerajeColaPato">Cola de pato</label></div>
+              <div id="cuerajeSubWrap" class="row" style="margin-top:8px; display:none;">
+                <div id="cuerajeCantinasWrap" style="display:none;">
+                  <label class="block hint">Forma de Cantinas</label>
+                  <div class="option-line"><input type="radio" name="cantinasForma" id="cantinasCuadradas" value="cuadradas"> <label for="cantinasCuadradas">Cuadradas</label></div>
+                  <div class="option-line"><input type="radio" name="cantinasForma" id="cantinasRedondas" value="redondas" checked> <label for="cantinasRedondas">Redondas</label></div>
+                </div>
+                <div id="cuerajeBastosWrap" style="display:none;">
+                  <label class="block hint">Forma de Bastos</label>
+                  <div class="option-line"><input type="radio" name="bastosForma" id="bastosCuadradas" value="cuadradas" checked> <label for="bastosCuadradas">Cuadradas</label></div>
+                  <div class="option-line"><input type="radio" name="bastosForma" id="bastosRedondas" value="redondas"> <label for="bastosRedondas">Redondas</label></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estribos -->
+          <div class="field">
+            <label class="block">4) Estribos</label>
+            <div class="subgroup">
+              <div class="option-line"><input type="radio" name="estribos" id="estrAbierto" value="abierto" checked> <label for="estrAbierto">Abierto</label></div>
+              <div class="option-line"><input type="radio" name="estribos" id="estrTapadera" value="tapadera"> <label for="estrTapadera">Tapadera</label></div>
+            </div>
+          </div>
+
+          
+          <!-- Arciones -->
+          <div class="field">
+            <label class="block">5) Arciones</label>
+            <div class="subgroup">
+              <div class="row" style="margin-top:6px;">
+                <div>
+                  <label class="block hint">Estilo</label>
+                  <div class="option-line"><input type="radio" name="arcEstilo" id="arcEstSenc" value="sencilla" checked> <label for="arcEstSenc">Sencillas</label></div>
+                  <div class="option-line"><input type="radio" name="arcEstilo" id="arcEstDobl" value="doble"> <label for="arcEstDobl">Dobles</label></div>
+                </div>
+                <div>
+                  <label class="block hint">Tipo</label>
+                  <div class="option-line"><input type="radio" name="arcTipo" id="arcTipoRec" value="recta" checked> <label for="arcTipoRec">Rectas</label></div>
+                  <div class="option-line"><input type="radio" name="arcTipo" id="arcTipoSud" value="sudadera"> <label for="arcTipoSud">Sudadera</label></div>
+                </div>
+              </div>
+              <div class="hint">Tipo (Rectas/Sudadera) solo aplica para: Esqueleto basto cuadrado y Esqueleto cola de pato. Para el resto, se usa Rectas.</div>
+            </div>
+          </div>
+
+          <!-- Herraje -->
+          <div class="field">
+            <label class="block">6) Herraje</label>
+            <div class="subgroup">
+              <div class="row" style="margin-top:6px;">
+                <div>
+                  <label class="block hint" for="herrajeEstilo">Estilo</label>
+                  <select id="herrajeEstilo">
+                    <option value="cuero">Cuero</option>
+                    <option value="cuerno">Cuerno de toro</option>
+                    <option value="inox_blanco">Acero inoxidable blanco</option>
+                    <option value="inox_pavonado">Acero inoxidable pavonado</option>
+                    <option value="fierro_aluminio">Fierro incrustado de aluminio</option>
+                    <option value="fierro_plata">Fierro incrustado de plata</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block hint" for="herrajeGreca">Greca</label>
+                  <select id="herrajeGreca">
+                    <option value="L">L</option>
+                    <option value="T">T</option>
+                    <option value="Y">Y</option>
+                  </select>
+                </div>
+              </div>
+              <label class="option-line" for="herrajeArgTapa"><input type="checkbox" id="herrajeArgTapa"> Argollas de tapa <span class="hint" style="margin-left:auto;">+ MX$1,000</span></label>
+              <div id="herrajeAviso" class="error" style="display:none;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2) Extras -->
+      <div class="card" id="extras">
+        <div class="card-header">
+          <h2>Textiles y Extras+</h2>
+          <span class="hint">Selecciona complementos</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label class="block">Textiles</label>
+            <div class="subgroup">
+              <label class="option-line" for="carona"><input type="checkbox" id="carona"> Carona <span class="hint" style="margin-left:auto;">según cueraje y tamaño</span></label>
+              <div class="row" style="margin-top:6px;">
+                <div>
+                  <label class="block hint">Zarape</label>
+                  <div class="option-line"><input type="radio" name="zarapeTipo" id="zarapeNinguno" value="ninguno" checked> <label for="zarapeNinguno">Ninguno</label></div>
+                  <div class="option-line"><input type="radio" name="zarapeTipo" id="zarapeSencillo" value="sencillo"> <label for="zarapeSencillo">Sencillo <span class="hint">+ MX$900</span></label></div>
+                  <div class="option-line"><input type="radio" name="zarapeTipo" id="zarapeFino" value="fino"> <label for="zarapeFino">Fino <span class="hint">+ MX$3,500</span></label></div>
+                </div>
+                <div>
+                  <label class="option-line" for="cincha"><input type="checkbox" id="cincha"> Cincha <span class="hint" style="margin-left:auto;">+ MX$1,200</span></label>
+                  <label class="block hint" for="cinchaMedida" style="margin-top:6px;">Medida (cm) de argolla a argolla con montura puesta</label>
+                  <input type="number" id="cinchaMedida" min="30" max="200" step="1" placeholder="Ej. 90" />
+                </div>
+              </div>
+              <label class="option-line" for="jaquima"><input type="checkbox" id="jaquima"> Jáquima / Bozalillo — Fino de faena <span class="hint" style="margin-left:auto;">+ MX$2,800</span></label>
+              <label class="option-line" for="cuarta"><input type="checkbox" id="cuarta"> Cuarta — Estándar <span class="hint" style="margin-left:auto;">+ MX$500</span></label>
+              <div class="hint">Los textiles se agregan al costo de la montura.</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="block">Cotizaciones especiales (cotizar con artesano)</label>
+            <div class="subgroup">
+              <label class="option-line" for="hebilla"><input type="checkbox" id="hebilla" data-label="Hebilla del cinturón"> Hebilla del cinturón <span class="hint" style="margin-left:auto;">cotizar aparte</span></label>
+              <label class="option-line" for="espuelas"><input type="checkbox" id="espuelas" data-label="Espuelas"> Espuelas <span class="hint" style="margin-left:auto;">cotizar aparte</span></label>
+              <label class="option-line" for="machete"><input type="checkbox" id="machete" data-label="Machete"> Machete <span class="hint" style="margin-left:auto;">cotizar aparte</span></label>
+              <label class="option-line" for="freno"><input type="checkbox" id="freno" data-label="Freno"> Freno <span class="hint" style="margin-left:auto;">cotizar aparte</span></label>
+              <label class="option-line" for="cuchillo"><input type="checkbox" id="cuchillo" data-label="Cuchillo"> Cuchillo <span class="hint" style="margin-left:auto;">cotizar aparte</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="block">Cinturón</label>
+            <div class="subgroup">
+              <label class="option-line" for="cinturon"><input type="checkbox" id="cinturon"> Cinturón de piel cosido a mano (2") <span class="hint" style="margin-left:auto;">+ MX$900</span></label>
+              <div class="row" style="margin-top:6px;">
+                <div>
+                  <label class="block hint" for="cinturonTalla">Talla de pantalón</label>
+                  <input type="text" id="cinturonTalla" placeholder="Ej. 30, 32, 34" />
+                </div>
+              </div>
+              <div class="hint">No incluye hebilla; se cotiza por separado.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3) Total y descarga -->
+      <aside class="card resumen" id="total" aria-live="polite">
+        <div class="card-header">
+          <h2>Total</h2>
+          <span class="hint">Actualizado en tiempo real (MXN)</span>
+        </div>
+        <div class="card-body">
+          <!-- Área que se captura para PDF/PNG -->
+          <div id="cotizacionCaptura" style="border:2px solid var(--border); border-radius:14px; padding:16px; background:#fff;">
+            <div class="quote-header" style="display:grid; grid-template-columns:auto 1fr auto; gap:12px 14px; align-items:center; margin-bottom:10px;">
+              <div class="brand-badge" style="width:42px; height:42px; border-radius:10px; background:linear-gradient(135deg,#fff,#e5e7eb); display:grid; place-items:center; color:var(--primary); font-weight:900;">CM</div>
+              <div class="quote-title">
+                <div style="font-weight:800;">Cotización</div>
+                <small class="hint">Montura + Textiles/Extras</small>
+              </div>
+              <div class="quote-meta hint">Fecha: <span id="quoteDate">—</span></div>
+            </div>
+
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <div>
+                <div class="hint">Precio total</div>
+                <div class="total" id="precioTotal">MX$0.00</div>
+              </div>
+              <div style="text-align:right;">
+                <div class="hint">Moneda</div>
+                <div style="font-weight:800;">MXN</div>
+              </div>
+            </div>
+
+            <div class="line" style="height:1px; background:var(--border); margin:12px 0;"></div>
+
+            <div>
+              <div class="hint" style="font-weight:700;">Detalle</div>
+              <ul id="detalleLista" class="breakdown" style="list-style:none; margin:6px 0 0; padding:0;"></ul>
+            </div>
+
+            <div class="quote-footer" style="margin-top:10px; display:flex; justify-content:space-between; align-items:center; color:var(--muted); font-size:.9rem;">
+              <span>by: Empresa</span>
+              <span>Contacto: WhatsApp +52 722 612 8347</span>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-outline" id="btnPdf">Descargar PDF</button>
+            <button class="btn" id="btnPng">Descargar PNG</button>
+            <a class="btn-outline" id="btnWhats" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+          </div>
+          <div class="hint" style="margin-top:6px;">Nota: después de abrir WhatsApp, adjunta el archivo descargado manualmente.</div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>by: Empresa — Todos los derechos reservados</p>
+    </div>
+  </footer>
+
+  <!-- Libs para exportar -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script>
+    (function() {
+      const $ = (sel, ctx=document) => ctx.querySelector(sel);
+      const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+      const money = (n) => (n || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' });
+
+      // Elements - Montura
+      const tamano = $('#tamano');
+      const tamanoError = $('#tamanoError');
+      const tamanoAviso = $('#tamanoAviso');
+      const fusteEstilo = $('#fusteEstilo');
+      const clienteMandaFuste = $('#clienteMandaFuste');
+      const fusteAviso = $('#fusteAviso');
+
+      const cuerajeRadios = $$('input[name="cueraje"]');
+      const cantinasFormaRadios = $$('input[name="cantinasForma"]');
+      const bastosFormaRadios = $$('input[name="bastosForma"]');
+
+      const estrRadios = $('input[name="estribos"]');
+      
+      const arcEstiloRadios = $('input[name="arcEstilo"]');
+      const arcTipoRadios = $('input[name="arcTipo"]');
+
+      const herrajeEstilo = $('#herrajeEstilo');
+      const herrajeGreca = $('#herrajeGreca');
+      const herrajeArgTapa = $('#herrajeArgTapa');
+      const herrajeAviso = $('#herrajeAviso');
+
+      // Elements - Extras
+      const extrasChecks = [
+        '#hebilla', '#espuelas', '#machete', '#freno', '#cuchillo'
+      ].map(id => $(id)).filter(Boolean);
+      const carona = $('#carona');
+      const zarapeRadios = $('input[name="zarapeTipo"]');
+      const cincha = $('#cincha');
+      const cinchaMedida = $('#cinchaMedida');
+      const jaquima = $('#jaquima');
+      const cuarta = $('#cuarta');
+      const cinturon = $('#cinturon');
+      const cinturonTalla = $('#cinturonTalla');
+
+      // Summary
+      const detalleLista = $('#detalleLista');
+      const precioTotalEl = $('#precioTotal');
+      const btnPdf = $('#btnPdf');
+      const btnPng = $('#btnPng');
+      const btnWhats = $('#btnWhats');
+
+      // DEFAULT PRICES (fallback). These can be overridden by precios.json
+      let PRICES = {
+        tamano: { basePrice: 0, normalSizes: [14,15,16], step: 0 },
+        fuste: {
+          estilos: { saldivar: 0, buchon: 0 },
+          descuentoClienteManda: 1000
+        },
+        cueraje: {
+          cantinas: {
+            mediano: { cuadradas: 22000, redondas: 22000 },
+            grande: { cuadradas: 25000, redondas: 25000 }
+          },
+          bastos: {
+            mediano: { cuadradas: 22000, redondas: 22000 },
+            grande: { cuadradas: 25000, redondas: 25000 }
+          },
+          esqueleto: { basto_cuadrado: 20000, cola_pato: 18000 }
+        },
+        estribos: { abierto: 0, tapadera: 1500 },
+        cabezada: [
+          { max: 54, price: 700, label: 'pequeña' },
+          { max: 60, price: 900, label: 'mediana' },
+          { max: Infinity, price: 1100, label: 'grande' },
+        ],
+        carciones: {
+          sencilla_recta: 600,
+          sencilla_sudadera: 700,
+          doble_recta: 900,
+          doble_sudadera: 1000
+        },
+        herraje: {
+          estilos: {
+            cuero: 0,
+            cuerno: 3000,
+            inox_blanco: 3500,
+            inox_pavonado: 4500,
+            fierro_aluminio: 9000,
+            fierro_plata: 0
+          },
+          argollas_tapa: 1000
+        },
+        extras: {
+          cincha: 1200,
+          jaquima: 2800,
+          cuarta: 500,
+          espuelas: 800,
+          machete: 900,
+          fechi: 650,
+          cuchillo: 500,
+          cinturon: 900
+        }
+      };
+      const specialItems = ['hebilla', 'espuelas', 'machete', 'freno', 'cuchillo'];
+      function mergeDeep(target, source) {
+      if (typeof target !== 'object' || target === null) return source;
+      if (typeof source !== 'object' || source === null) return target;
+      const out = Array.isArray(target) ? [...target] : { ...target };
+      Object.keys(source).forEach(key => {
+      if (Array.isArray(source[key])) {
+      out[key] = source[key].slice();
+      } else if (typeof source[key] === 'object' && source[key] !== null) {
+      out[key] = mergeDeep(out[key] || {}, source[key]);
+      } else {
+      out[key] = source[key];
+      }
+      });
+      return out;
+      }
+      
+      function syncUIPrices() {
+        // Actualiza los textos visibles de extras según PRICES
+        const ex = PRICES.extras || {};
+        Object.keys(ex).forEach(key => {
+          const chk = document.getElementById(key);
+          if (!chk) return;
+          if (specialItems.includes(key)) return;
+          chk.dataset.price = String(ex[key]);
+          const label = chk.closest('label');
+          const hint = label && label.querySelector('.hint');
+          if (hint) hint.textContent = '+ ' + money(Number(ex[key] || 0));
+        });
+      }
+            
+      async function loadPrices() {
+        try {
+          const res = await fetch('precios.json?ts=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            PRICES = mergeDeep(PRICES, data);
+          }
+        } catch (e) {
+          // ignorar si no existe o no puede leerse (p.ej., restricciones del navegador)
+        } finally {
+          syncUIPrices();
+          calcular();
+        }
+      }
+
+      function updateHerrajeUIAvailability() {
+        const estilo = herrajeEstilo?.value;
+        const allowArgTapa = estilo === 'inox_blanco' || estilo === 'inox_pavonado' || estilo === 'fierro_aluminio' || estilo === 'fierro_plata';
+        if (herrajeArgTapa) {
+          herrajeArgTapa.disabled = !allowArgTapa;
+          if (!allowArgTapa) herrajeArgTapa.checked = false;
+        }
+        if (herrajeAviso) {
+          if (estilo === 'fierro_plata') {
+            herrajeAviso.textContent = 'Herraje de plata: Trabajo especial; se cotiza directo con el artesano.';
+            herrajeAviso.style.display = 'block';
+          } else {
+            herrajeAviso.textContent = '';
+            herrajeAviso.style.display = 'none';
+          }
+        }
+      }
+
+      function renderCuerajeSub() {
+        const val = cuerajeRadios.find(r => r.checked)?.value;
+        const subWrap = document.getElementById('cuerajeSubWrap');
+        const cantWrap = document.getElementById('cuerajeCantinasWrap');
+        const bastWrap = document.getElementById('cuerajeBastosWrap');
+        const showShapes = (val === 'cantinas' || val === 'bastos');
+        if (subWrap) subWrap.style.display = showShapes ? '' : 'none';
+        if (val === 'cantinas') {
+          if (cantWrap) cantWrap.style.display = '';
+          if (bastWrap) bastWrap.style.display = 'none';
+        } else if (val === 'bastos') {
+          if (cantWrap) cantWrap.style.display = 'none';
+          if (bastWrap) bastWrap.style.display = '';
+        } else {
+          if (cantWrap) cantWrap.style.display = 'none';
+          if (bastWrap) bastWrap.style.display = 'none';
+        }
+        enforceArcionTipoRules();
+      }
+      function enforceArcionTipoRules() {
+        const cuerajeSel = cuerajeRadios.find(r => r.checked)?.value;
+        const allowed = (cuerajeSel === 'esqueleto' || cuerajeSel === 'cola_pato' || cuerajeSel === 'esqueleto_basto_cuadrado' || cuerajeSel === 'esqueleto_cola_de_pato');
+        const sud = document.getElementById('arcTipoSud');
+        const rec = document.getElementById('arcTipoRec');
+        if (sud) sud.disabled = !allowed;
+        if (!allowed && sud && sud.checked && rec) { rec.checked = true; }
+      }
+
+      // Pricing helpers (all use PRICES)
+      function precioTamano(pulg) {
+        const cfg = PRICES.tamano;
+        if (Number.isNaN(pulg)) return { price: 0, desc: 'Tamaño no especificado' };
+        const base = Number(cfg.basePrice || 0);
+        const normal = cfg.normalSizes || [14,15,16];
+        const step = Number(cfg.step || 0);
+        if (normal.includes(pulg)) {
+          const descBase = `Tamaño ${pulg}" (precio base)`;
+          const desc = (pulg > 16) ? descBase + ' — Trabajo especial' : descBase;
+          return { price: base, desc };
+        }
+        let mod = 0;
+        if (pulg > Math.max(...normal)) mod = step * (pulg - Math.max(...normal));
+        else if (pulg < Math.min(...normal)) mod = -step * (Math.min(...normal) - pulg);
+        let desc = `Tamaño ${pulg}" (${mod >= 0 ? '+' : ''}${mod} vs base)`;
+        if (pulg > 16) desc += ' — Trabajo especial';
+        return { price: base + mod, desc };
+      }
+
+      function precioFuste() {
+        const estiloKey = fusteEstilo?.value || 'saldivar';
+        const medida = parseFloat(tamano?.value);
+        let aviso = '';
+        if (Number.isFinite(medida) && medida >= 16.5) {
+          aviso = 'Fuste de 16.5" o mayor: se cotiza por mensaje directo (Trabajos especiales).';
+        }
+        let price = Number(PRICES.fuste?.estilos?.[estiloKey] || 0);
+        const estiloLabel = estiloKey === 'saldivar' ? 'Saldívar' : 'Buchón';
+        let desc = `Fuste: ${estiloLabel}${Number.isFinite(medida) ? ` — ${medida}\"` : ''}`;
+        if (Number.isFinite(medida) && medida < 14) {
+          // En fustes menores a 14", el costo del fuste ya va incluido en la cotización
+          price = 0;
+          desc += ' (costo incluido)';
+        }
+        if (fusteAviso) {
+          if (aviso) { fusteAviso.textContent = aviso; fusteAviso.style.display = 'block'; }
+          else { fusteAviso.textContent = ''; fusteAviso.style.display = 'none'; }
+        }
+        return { price, desc };
+      }
+
+      function precioCueraje() {
+        const val = cuerajeRadios.find(r => r.checked)?.value;
+        const pulgadas = parseFloat(tamano?.value);
+        const grande = Number.isFinite(pulgadas) && pulgadas >= 16;
+        if (val === 'cantinas' || val === 'bastos') {
+          const forma = (val === 'cantinas'
+            ? (cantinasFormaRadios.find(r => r.checked)?.value)
+            : (bastosFormaRadios.find(r => r.checked)?.value)) || 'cuadradas';
+          const tier = grande ? 'grande' : 'mediano';
+          const cfg = PRICES.cueraje[val];
+          const p = Number(cfg?.[tier]?.[forma] || 0);
+          const bastoLbl = grande ? 'basto grande' : 'basto mediano';
+          const tipoLbl = val === 'cantinas' ? 'Cantinas' : 'Bastos';
+          return { price: p, desc: `${tipoLbl}: ${forma} — ${bastoLbl}` };
+        }
+        if (val === 'esqueleto') return { price: Number(PRICES.cueraje.esqueleto?.basto_cuadrado || 0), desc: 'Esqueleto basto cuadrado' };
+        if (val === 'cola_pato') return { price: Number(PRICES.cueraje.esqueleto?.cola_pato || 0), desc: 'Esqueleto cola de pato' };
+        // Fallback base por defecto si no hay selección válida
+        const baseDef = Number(PRICES.cueraje?.cantinas?.mediano?.redondas || 22000);
+        return { price: baseDef, desc: 'Cantinas: redondas — basto mediano (base por defecto)' };
+      }
+
+      function precioEstribos() {
+        const v = estrRadios.find(r => r.checked)?.value;
+        const price = Number(PRICES.estribos[v] || 0);
+        const label = v === 'tapadera' ? 'Estribos: Tapadera' : 'Estribos: Abierto';
+        return { price, desc: label };
+      }
+
+      function precioCabezada() {
+        const cm = parseInt(medidaCabezada.value, 10);
+        let tier = PRICES.cabezada[1]; // mediana por defecto
+        if (!Number.isNaN(cm)) {
+          for (const t of PRICES.cabezada) { if (cm <= t.max) { tier = t; break; } }
+        }
+        return { price: Number(tier.price || 0), desc: `Cabezada (${tier.label}${Number.isNaN(cm) ? '' : ' ' + cm + 'cm'})` };
+      }
+
+      function precioCarciones() {
+        const est = arcEstiloRadios.find(r => r.checked)?.value || 'sencilla';
+        let tip = arcTipoRadios.find(r => r.checked)?.value || 'recta';
+        const cuerajeSel = cuerajeRadios.find(r => r.checked)?.value;
+        const tipoPermitido = (cuerajeSel === 'esqueleto' || cuerajeSel === 'cola_pato' || cuerajeSel === 'esqueleto_basto_cuadrado' || cuerajeSel === 'esqueleto_cola_de_pato');
+        if (!tipoPermitido) tip = 'recta';
+        const key = `${est}_${tip}`; // ej. sencilla_recta, doble_sudadera
+        const price = Number(PRICES.carciones[key] || 0);
+        const estLbl = est === 'sencilla' ? 'Sencillas' : 'Dobles';
+        const tipLbl = tip === 'recta' ? 'Rectas' : 'De sudadera';
+        return { price, desc: `Arciones: ${estLbl} — ${tipLbl}${tipoPermitido ? '' : ' (tipo fijo por cueraje)'}` };
+      }
+
+      function precioHerraje() {
+        const estilo = herrajeEstilo?.value || 'cuero';
+        const greca = herrajeGreca?.value || 'L';
+        const estilosDelta = (PRICES.herraje && PRICES.herraje.estilos) || { cuero: 0, cuerno: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 0 };
+        let price = Number(estilosDelta[estilo] || 0);
+        let desc = `Herraje: ${{
+          cuero: 'Cuero', cuerno: 'Cuerno de toro', inox_blanco: 'Acero inoxidable blanco',
+          inox_pavonado: 'Acero inoxidable pavonado', fierro_aluminio: 'Fierro incrustado de aluminio', fierro_plata: 'Fierro incrustado de plata'
+        }[estilo] || '—'} — Greca ${greca}`;
+        const allowArgTapa = estilo === 'inox_blanco' || estilo === 'inox_pavonado' || estilo === 'fierro_aluminio' || estilo === 'fierro_plata';
+        const argTapaCost = (PRICES.herraje && PRICES.herraje.argollas_tapa) || 1000;
+        if (allowArgTapa && herrajeArgTapa?.checked) {
+          price += Number(argTapaCost || 0);
+          desc += ' — Argollas de tapa';
+        }
+        if (estilo === 'fierro_plata') {
+          desc += ' (Trabajo especial)';
+          price = 0;
+        }
+        return { price, desc };
+      }
+
+      function precioCarona() {
+        const cfg = PRICES.carona || { cola_pato: 800, basto_cuadrado: 1000, mediano: 1200, grande: 1500 };
+        const pulgadas = parseFloat(tamano?.value);
+        const grande = Number.isFinite(pulgadas) && pulgadas >= 16;
+        const cuerajeSel = cuerajeRadios.find(r => r.checked)?.value;
+        let price = 0;
+        let descPart = '';
+        if (cuerajeSel === 'cola_pato') {
+          price = cfg.cola_pato;
+          descPart = 'cola de pato';
+        } else if (cuerajeSel === 'esqueleto') {
+          price = cfg.basto_cuadrado;
+          descPart = 'basto cuadrado';
+        } else if (cuerajeSel === 'cantinas' || cuerajeSel === 'bastos') {
+          price = grande ? cfg.grande : cfg.mediano;
+          const shape = cuerajeSel === 'cantinas' ? (cantinasFormaRadios.find(r => r.checked)?.value || 'cuadradas') : (bastosFormaRadios.find(r => r.checked)?.value || 'cuadradas');
+          descPart = `${cuerajeSel} ${shape} basto ${grande ? 'grande' : 'mediano'}`;
+        } else {
+          descPart = 'no aplicable';
+        }
+        return { price: Number(price || 0), desc: `Carona (${descPart})` };
+      }
+
+      function getExtras() {
+        const items = [];
+        if (carona && carona.checked) {
+          const c = precioCarona();
+          items.push({ text: c.desc, price: c.price });
+        }
+        const zSel = zarapeRadios.find(r => r.checked)?.value || 'ninguno';
+        const zCfg = PRICES.zarape || { sencillo: 900, fino: 3500 };
+        if (zSel === 'sencillo') items.push({ text: 'Zarape — Sencillo (de algodón con acrilán)', price: zCfg.sencillo });
+        if (zSel === 'fino') items.push({ text: 'Zarape — Fino (de lana de borrego, teñido natural, tejido en telar)', price: zCfg.fino });
+        if (cincha && cincha.checked) {
+          const med = cinchaMedida?.value?.trim();
+          items.push({ text: `Cincha${med ? ' (' + med + 'cm)' : ''}`, price: Number(PRICES.extras?.cincha || 1200) });
+        }
+        if (jaquima && jaquima.checked) items.push({ text: 'Jáquima / Bozalillo — Fino de faena', price: Number(PRICES.extras?.jaquima || 2800) });
+        if (cuarta && cuarta.checked) items.push({ text: 'Cuarta — Estándar', price: Number(PRICES.extras?.cuarta || 500) });
+        if (cinturon && cinturon.checked) {
+          const talla = cinturonTalla?.value?.trim();
+          items.push({ text: `Cinturón de piel${talla ? ' (talla ' + talla + ')' : ''}`, price: Number(PRICES.extras?.cinturon || 900) });
+        }
+        extrasChecks.filter(chk => chk.checked).forEach(chk => {
+        const key = chk.id;
+        const isSpecial = specialItems.includes(key);
+        let p = isSpecial ? 0 : (PRICES.extras?.[key] || Number(chk.dataset.price || 0));
+        let text = chk.dataset.label || key;
+        if (isSpecial) {
+        const estilo = herrajeEstilo?.value || 'cuero';
+        const note = estilo === 'cuero' ? 'pendiente' : 'trabajo especial';
+        text += ` (${note})`;
+        }
+        items.push({ text, price: Number(p) });
+        });
+        return items;
+      }
+
+      function validarTamano() {
+        const val = tamano.value.trim();
+        const num = val === '' ? NaN : Number(val);
+        const invalid = Number.isNaN(num);
+        tamanoError.style.display = invalid ? 'block' : 'none';
+        if (!invalid && tamanoAviso) {
+          if (num > 16) {
+            tamanoAviso.style.display = 'block';
+          } else {
+            tamanoAviso.style.display = 'none';
+          }
+        }
+        return invalid ? null : num;
+      }
+
+      function calcular() {
+        const items = [];
+
+        // Tamaño
+        const pulgadas = validarTamano();
+        const t = precioTamano(Number.isFinite(pulgadas) ? pulgadas : (PRICES.tamano.normalSizes?.[1] || 15));
+        items.push({ text: t.desc, price: t.price });
+
+        // Fuste
+        { 
+          const f = precioFuste(); 
+          items.push({ text: f.desc, price: f.price }); 
+          if (clienteMandaFuste && clienteMandaFuste.checked) {
+            items.push({ text: 'El cliente envía su fuste', price: -Number(PRICES.fuste?.descuentoClienteManda || 1000) });
+          }
+        }
+
+        // Cueraje con Herraje
+        const cq = precioCueraje();
+        const h = precioHerraje();
+        cq.price += h.price;
+        cq.desc += ` con ${h.desc.replace(/^Herraje: /, '')}`;
+        items.push({ text: cq.desc, price: cq.price });
+
+        // Estribos
+        const e = precioEstribos();
+        items.push({ text: e.desc, price: e.price });
+
+        
+        // Carciones
+        const car = precioCarciones();
+        items.push({ text: car.desc, price: car.price });
+
+        // Extras
+        getExtras().forEach(x => items.push({ text: x.text, price: x.price }));
+
+        // Total
+        const total = items.reduce((s, it) => s + (Number(it.price) || 0), 0);
+
+        // Render
+        detalleLista.innerHTML = items.map(it => `
+          <li>
+            <span>${it.text}</span>
+            <strong>${money(it.price)}</strong>
+          </li>
+        `).join('');
+        precioTotalEl.textContent = money(total);
+
+        // WhatsApp
+        const phone = '527226128347';
+        const text = encodeURIComponent('Hola, tengo esta cotización y se mando el pdf o png descargado.');
+        btnWhats.href = `https://wa.me/${phone}?text=${text}`;
+      }
+
+      // Events
+      [tamano].forEach(el => el && el.addEventListener('input', calcular));
+      [fusteEstilo, clienteMandaFuste].forEach(el => el && el.addEventListener('change', calcular));
+      [...extrasChecks].forEach(el => el.addEventListener('change', calcular));
+      if (carona) carona.addEventListener('change', calcular);
+      if (cincha) cincha.addEventListener('change', calcular);
+      if (jaquima) jaquima.addEventListener('change', calcular);
+      if (cuarta) cuarta.addEventListener('change', calcular);
+      if (cinturon) cinturon.addEventListener('change', calcular);
+      zarapeRadios.forEach(r => r.addEventListener('change', calcular));
+      estrRadios.forEach(r => r.addEventListener('change', calcular));
+      cuerajeRadios.forEach(r => r.addEventListener('change', () => { renderCuerajeSub(); calcular(); }));
+      cantinasFormaRadios.forEach(r => r.addEventListener('change', calcular));
+      bastosFormaRadios.forEach(r => r.addEventListener('change', calcular));
+      arcEstiloRadios.forEach(r => r.addEventListener('change', calcular));
+      arcTipoRadios.forEach(r => r.addEventListener('change', calcular));
+
+      // Fuste inputs handled above (estilo/medida/clienteMandaFuste)
+
+      // Herraje controles
+      if (herrajeEstilo) herrajeEstilo.addEventListener('change', () => { updateHerrajeUIAvailability(); calcular(); });
+      if (herrajeGreca) herrajeGreca.addEventListener('change', calcular);
+      if (herrajeArgTapa) herrajeArgTapa.addEventListener('change', calcular);
+      
+      // Button ripple effect
+      document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.btn, .btn-outline');
+        if (!btn) return;
+        const rect = btn.getBoundingClientRect();
+        const d = Math.max(btn.clientWidth, btn.clientHeight);
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.width = ripple.style.height = d + 'px';
+        ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+        ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
+        const old = btn.querySelector('.ripple');
+        if (old) old.remove();
+        btn.appendChild(ripple);
+      }, { passive: true });
+
+      // Export PNG
+      btnPng.addEventListener('click', async () => {
+        const area = document.getElementById('cotizacionCaptura');
+        const canvas = await html2canvas(area, { scale: 2 });
+        const dataUrl = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+        a.download = `cotizacion-montura-${stamp}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+
+      // Export PDF
+      btnPdf.addEventListener('click', async () => {
+        const area = document.getElementById('cotizacionCaptura');
+        const canvas = await html2canvas(area, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        pdf.setProperties({
+          title: 'Cotización Montura',
+          subject: 'Cotización generada desde el cotizador',
+          creator: 'by: Empresa'
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10; // mm
+
+        // Ajuste para que TODA la imagen quepa en una sola página con márgenes
+        const imgWidthPx = canvas.width;
+        const imgHeightPx = canvas.height;
+        const maxW = pageWidth - margin * 2;
+        const maxH = pageHeight - margin * 2;
+        const ratio = Math.min(maxW / imgWidthPx, maxH / imgHeightPx);
+        const imgW = imgWidthPx * ratio;
+        const imgH = imgHeightPx * ratio;
+
+        // Centrar en la página
+        const x = (pageWidth - imgW) / 2;
+        const y = (pageHeight - imgH) / 2;
+        pdf.addImage(imgData, 'PNG', x, y, imgW, imgH);
+
+        const now = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+        pdf.save(`cotizacion-montura-${stamp}.pdf`);
+      });
+
+      // Init
+      updateHerrajeUIAvailability();
+      renderCuerajeSub();
+      enforceArcionTipoRules();
+      // Inicialización de fuste: limpiar aviso
+      if (document.getElementById('fusteAviso')) { document.getElementById('fusteAviso').style.display = 'none'; }
+      const qdEl = document.getElementById('quoteDate');
+      if (qdEl) {
+        qdEl.textContent = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date());
+      }
+      syncUIPrices();
+      calcular();
+      // Cargar precios desde precios.json (si accesible)
+      loadPrices();
+    })();
+  </script>
+</body>
+</html>
