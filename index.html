@@ -404,7 +404,7 @@
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-  <script>
+<script>
     function money(n) { return (n || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }); }
     let PRECIOS = null;
 
@@ -454,7 +454,6 @@
     function getCuerajePrice(cuerajeVal, herrajeVal) {
       if (!PRECIOS) return { base: 0, delta: 0, especial: false };
       let base = 0;
-      let extra = 0;
       let especial = false;
       let cuerajeKey, bastoKey, formaKey;
       if (/cantinas|bastos/.test(cuerajeVal)) {
@@ -601,6 +600,22 @@
       btnWhats.href = `https://wa.me/${phone}?text=${text}`;
     }
 
+    // Ripple efecto botones
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn, .btn-outline');
+      if (!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const d = Math.max(btn.clientWidth, btn.clientHeight);
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = d + 'px';
+      ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
+      const old = btn.querySelector('.ripple');
+      if (old) old.remove();
+      btn.appendChild(ripple);
+    }, { passive: true });
+
     // PDF mejorado
     btnPdf.addEventListener('click', async () => {
       const area = document.getElementById('cotizacionResumen');
@@ -682,6 +697,6 @@
 
     loadPrices();
     setInterval(setQuoteDate, 60000);
-  </script>
+</script>
 </body>
 </html>
