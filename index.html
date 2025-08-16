@@ -399,7 +399,7 @@
   </main>
   <footer class="site-footer">
     <div class="container">
-      <p>By: JP — Todos los derechos reservados - v1.3</p>
+      <p>By: JP — Todos los derechos reservados - v1.4</p>
     </div>
   </footer>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -616,7 +616,7 @@
       btn.appendChild(ripple);
     }, { passive: true });
 
-    // Fuerza fondo y color opacos a toda la sección "total" y sus hijos SOLO durante exportación
+    // --- UTILIDADES PARA EXPORTACIÓN PDF/PNG ---
     function forceExportStyles(el) {
       el.style.background = '#fff';
       el.style.backgroundColor = '#fff';
@@ -647,11 +647,35 @@
       }
       return backup;
     }
+    function disableAnimationsTemporarily(el) {
+      el.style.animation = 'none';
+      el.style.transition = 'none';
+      for (const child of el.children) disableAnimationsTemporarily(child);
+    }
+    function restoreAnimations(el, backup) {
+      el.style.animation = backup.animation;
+      el.style.transition = backup.transition;
+      if (el.children && backup.children) {
+        for (let i = 0; i < el.children.length; i++) {
+          restoreAnimations(el.children[i], backup.children[i]);
+        }
+      }
+    }
+    function backupAnimationStyles(el) {
+      return {
+        animation: el.style.animation,
+        transition: el.style.transition,
+        children: Array.from(el.children).map(backupAnimationStyles)
+      };
+    }
 
     // PDF
     btnPdf.addEventListener('click', async () => {
       const area = document.getElementById('total');
       const styleBackup = backupStyles(area);
+      const animBackup = backupAnimationStyles(area);
+
+      disableAnimationsTemporarily(area);
       forceExportStyles(area);
       await new Promise(res => setTimeout(res, 80));
       const canvas = await html2canvas(area, {
@@ -660,6 +684,8 @@
         useCORS: true
       });
       restoreExportStyles(area, styleBackup);
+      restoreAnimations(area, animBackup);
+
       const imgData = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -686,6 +712,9 @@
     btnPng.addEventListener('click', async () => {
       const area = document.getElementById('total');
       const styleBackup = backupStyles(area);
+      const animBackup = backupAnimationStyles(area);
+
+      disableAnimationsTemporarily(area);
       forceExportStyles(area);
       await new Promise(res => setTimeout(res, 80));
       const canvas = await html2canvas(area, {
@@ -694,6 +723,8 @@
         useCORS: true
       });
       restoreExportStyles(area, styleBackup);
+      restoreAnimations(area, animBackup);
+
       const dataUrl = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = dataUrl;
