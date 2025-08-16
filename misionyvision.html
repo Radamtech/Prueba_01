@@ -122,8 +122,17 @@
     }
     .line { height: 1.2px; background: var(--border); margin: 16px 0; border-radius: 2.4px;}
     .actions {
-      display: flex; gap: 11px; flex-wrap: wrap; margin-top: auto;
-      align-items: center; justify-content: flex-end;
+      display: flex;
+      flex-wrap: nowrap;   /* NO se apilan nunca, siempre en la misma fila */
+      gap: 11px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-top: auto;
+      overflow-x: auto;    /* Permite hacer scroll horizontal si no caben */
+    }
+    .actions .btn, .actions .btn-outline {
+      min-width: 170px;    /* Opcional: para que ambos botones tengan tamaño uniforme */
+      text-align: center;
     }
     .btn, .btn-outline {
       border-radius: 12px; padding: 12px 20px; font-weight: 800; cursor: pointer;
@@ -179,6 +188,7 @@
       .card-header { flex-direction: column; align-items: flex-start; gap: 4px; padding-left: 10px;}
       .card-body { padding: 14px; }
       .grid { gap: 18px; }
+      .actions .btn, .actions .btn-outline { min-width: 120px; }
     }
   </style>
 </head>
@@ -235,7 +245,7 @@
   </main>
   <footer class="site-footer">
     <div class="container">
-      <p>By: JP — Todos los derechos reservados</p>
+      <p>By: JP — Todos los derechos reservados - v1.2</p>
     </div>
   </footer>
   <script>
