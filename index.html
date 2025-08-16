@@ -616,7 +616,7 @@
       btn.appendChild(ripple);
     }, { passive: true });
 
-    // --- UTILIDADES PARA EXPORTACIÓN PDF/PNG ---
+    // --- EXPORTACIÓN PDF/PNG SOLO DEL CUADRO DE COTIZACIÓN ---
     function forceExportStyles(el) {
       el.style.background = '#fff';
       el.style.backgroundColor = '#fff';
@@ -671,7 +671,7 @@
 
     // PDF
     btnPdf.addEventListener('click', async () => {
-      const area = document.getElementById('total');
+      const area = document.getElementById('cotizacionResumen');
       const styleBackup = backupStyles(area);
       const animBackup = backupAnimationStyles(area);
 
@@ -710,7 +710,7 @@
 
     // PNG
     btnPng.addEventListener('click', async () => {
-      const area = document.getElementById('total');
+      const area = document.getElementById('cotizacionResumen');
       const styleBackup = backupStyles(area);
       const animBackup = backupAnimationStyles(area);
 
