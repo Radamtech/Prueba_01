@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cotizador de Monturas</title>
-  <meta name="description" content="Cotizador de monturas ecuestres con extras. Descarga tu cotización en PDF o comparte por WhatsApp." />
+  <meta name="description" content="Cotizador de monturas ecuestres con extras. Descarga tu cotización en PDF o PNG y compártela por WhatsApp." />
   <style>
     :root {
       --primary: #c2410c;
@@ -13,53 +13,207 @@
       --bg: #fff7ed;
       --text: #1f2937;
       --muted: #6b7280;
-      --card: #ffffff;
-      --border: #f1e5d1;
+      --card: #fffcf7;
+      --border: #eab30833;
       --danger: #dc2626;
+      --shadow: 0 4px 32px 0 rgba(234, 88, 12, 0.12);
     }
     * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial;
-      background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 35%, #fefce8 100%);
+      margin: 0; font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial;
+      background: linear-gradient(180deg, #fff7ed 0%, #f9fafb 90%);
       color: var(--text); min-height: 100vh;
       display: flex; flex-direction: column;
+      transition: background .2s;
     }
     .container { max-width: 1000px; margin: 0 auto; padding: 0 16px; width: 100%; }
-    .site-header { background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #fff; padding: 18px 0 10px; margin-bottom: 20px; }
-    .site-header .brand { font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 14px; }
-    .site-header .brand .logo { background: #fff; color: var(--primary); width: 40px; height: 40px; display: grid; place-items: center; border-radius: 8px; font-size: 1.2em; font-weight: 900; }
-    .site-header nav a { color: #fff; text-decoration: none; margin-left: 18px; font-weight: 600; }
-    .site-header nav a:hover { text-decoration: underline; }
+    .site-header {
+      background: linear-gradient(90deg, var(--primary), var(--secondary)); color: #fff; padding: 18px 0 10px; margin-bottom: 20px;
+      box-shadow: 0 4px 20px 0 #eab30855;
+      position: sticky; top: 0; z-index: 20;
+      animation: headerFadeIn .9s cubic-bezier(.9,.12,.23,1.22);
+    }
+    @keyframes headerFadeIn { from { opacity: 0; transform: translateY(-30px);} to { opacity: 1; transform: none;}}
+    .site-header .brand {
+      font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 14px;
+      letter-spacing: .3px;
+    }
+    .site-header .brand .logo {
+      background: linear-gradient(135deg, #fff, #ffecc4); color: var(--primary);
+      width: 44px; height: 44px; display: grid; place-items: center;
+      border-radius: 12px; font-size: 1.25em; font-weight: 900;
+      box-shadow: 0 3px 12px #eab30844, 0 1px 5px #fff4;
+      border: 2px solid var(--accent);
+      transition: box-shadow .18s;
+    }
+    .site-header .brand .logo:hover { box-shadow: 0 0 0 5px #eab30833, 0 3px 12px #eab30855;}
+    .site-header nav a {
+      color: #fff; text-decoration: none; margin-left: 18px; font-weight: 600;
+      border-bottom: 2px solid transparent; padding-bottom: 3px;
+      opacity: .94; transition: all 160ms;
+      letter-spacing: .2px;
+    }
+    .site-header nav a:hover {
+      opacity: 1; border-color: var(--accent); color: #fef9c3;
+      filter: drop-shadow(0 0 6px #ffe06677);
+    }
     main { flex: 1 0 auto; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 3px 18px rgba(2, 6, 23, 0.08); margin-bottom: 18px; padding: 22px; }
-    .card-header { font-size: 1.2rem; font-weight: 700; margin-bottom: 16px; }
-    .field { margin-bottom: 14px; }
-    .field label { font-weight: 700; display: block; margin-bottom: 6px; }
+    .card {
+      background: var(--card); border: 1.5px solid var(--border); border-radius: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px; padding: 26px 22px 22px 22px;
+      animation: cardIn .5s cubic-bezier(.7,-0.08,.28,1.09);
+      position: relative;
+      overflow: hidden;
+      transition: box-shadow .18s, border-color .18s;
+    }
+    @keyframes cardIn { 0% {opacity:0;transform:translateY(32px) scale(.99);} 100% {opacity:1;transform:none;} }
+    .card-header {
+      font-size: 1.22rem; font-weight: 800; margin-bottom: 18px; letter-spacing: .1px;
+      color: var(--primary);
+      text-shadow: 0 1px 0 #fff, 0 2px 6px #ffecc47a;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .field { margin-bottom: 16px; position: relative; }
+    .field label { font-weight: 700; display: block; margin-bottom: 7px; }
     .row { display: flex; gap: 14px; }
-    .subgroup { background: #fafaf9; border: 1px dashed var(--border); border-radius: 10px; padding: 12px; }
+    .subgroup {
+      background: linear-gradient(90deg, #fffbe5 0%, #fff9e6 100%);
+      border: 1px dashed var(--border); border-radius: 13px; padding: 12px;
+      box-shadow: 0 1px 8px #ffecc44a;
+    }
     select, input[type="number"], input[type="text"] {
-      padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; width: 100%;
-      margin-bottom: 4px;
+      padding: 10px 12px; border: 1.2px solid var(--border); border-radius: 9px; font-size: 1.04rem; width: 100%;
+      margin-bottom: 4px; background: #fffbeed9; color: var(--text);
+      transition: border-color .2s, box-shadow .18s;
+      box-shadow: 0 1px 5px #ffecc432;
     }
-    input[type="checkbox"], input[type="radio"] { accent-color: var(--primary); }
-    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+    select:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px #ffe06644; outline: none;}
+    input[type="checkbox"], input[type="radio"] {
+      accent-color: var(--primary);
+      transform: scale(1.16);
+      margin-right: 6px;
+      transition: accent-color .2s;
+    }
+    input[type="checkbox"]:focus, input[type="radio"]:focus { outline: 2px solid var(--accent);}
+    .actions {
+      display: flex; gap: 11px; flex-wrap: wrap; margin-top: 20px;
+      align-items: center; justify-content: flex-end;
+    }
     .btn, .btn-outline {
-      border-radius: 10px; padding: 12px 18px; font-weight: 800; cursor: pointer;
-      transition: box-shadow 0.2s, transform 0.15s;
+      border-radius: 12px; padding: 13px 22px; font-weight: 800; cursor: pointer;
+      font-size: 1.01rem; letter-spacing: .05em;
+      box-shadow: 0 2px 8px #eab3081a, 0 1.5px 8px #fff4;
+      position: relative; overflow: hidden; isolation: isolate;
+      transition: transform .15s, box-shadow .15s, background .16s;
     }
-    .btn { background: linear-gradient(90deg, #fef9c3, var(--accent)); border: 0; color: #0b1020; }
-    .btn-outline { background: #fff; border: 1px solid var(--border); color: var(--muted); }
-    .btn:hover, .btn-outline:hover { box-shadow: 0 6px 20px rgba(245,158,11,0.08); transform: translateY(-2px); }
-    .total { font-size: 2rem; font-weight: 900; color: var(--primary); margin: 10px 0 6px;}
-    .error { color: var(--danger); font-size: .96rem; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 6px 10px; margin: 8px 0 0; display: none; }
+    .btn {
+      color: #0b1020;
+      background: linear-gradient(90deg, #fef9c3, var(--accent), #ffedd5);
+      background-size: 200% 200%;
+      animation: gradientShift 6s ease infinite;
+      border: none;
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+      box-shadow: 0 6px 18px #eab30842, 0 1px 5px #fff4;
+    }
+    .btn-outline {
+      background: #fff;
+      border: 1.2px solid var(--border);
+      color: var(--primary);
+      box-shadow: 0 2px 10px #f59e0b14, 0 1px 5px #fff4;
+    }
+    .btn:active, .btn-outline:active, .btn:focus, .btn-outline:focus {
+      transform: scale(.96);
+      filter: brightness(.97);
+    }
+    .btn:hover, .btn-outline:hover {
+      transform: translateY(-2px) scale(1.01);
+      box-shadow: 0 10px 28px #fde68a92, 0 0 0 7px #fffbe3;
+      filter: brightness(1.02);
+    }
+    @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}}
+    .btn .ripple, .btn-outline .ripple {
+      position: absolute; pointer-events: none; border-radius: 9999px;
+      transform: scale(0); background: rgba(255,255,255,.55);
+      animation: ripple 560ms ease;
+      mix-blend-mode: screen;
+      z-index: 10;
+    }
+    @keyframes ripple {to {transform:scale(4);opacity:0;}}
+    .total {
+      font-size: 2.2rem; font-weight: 900; color: var(--primary); margin: 10px 0 6px;
+      letter-spacing: .03em; text-shadow: 0 2px 0 #fff, 0 2px 6px #ffecc47a;
+      animation: fadeInTotal .4s cubic-bezier(.7,-.06,.22,1.09);
+    }
+    @keyframes fadeInTotal {0%{opacity:0;transform:scale(.91);}100%{opacity:1;transform:none;}}
+    .error {
+      color: var(--danger); font-size: .98rem;
+      background: #fee2e2bb; border: 1px solid #fecaca;
+      border-radius: 8px; padding: 8px 14px; margin: 10px 0 0; display: none;
+      box-shadow: 0 2px 14px #ef44440d;
+      animation: fadeInError .4s cubic-bezier(.7,-.06,.22,1.09);
+    }
+    @keyframes fadeInError {0%{opacity:0;transform:scale(.97);}100%{opacity:1;transform:none;}}
     @media (max-width: 740px) { .row { flex-direction: column; } }
-    .site-footer { background: #0b1020; color: #cbd5e1; padding: 20px 0; text-align: center; margin-top: 0; }
+    .site-footer {
+      background: #0b1020; color: #ffc66d;
+      padding: 20px 0; text-align: center; margin-top: 0;
+      box-shadow: 0 -3px 12px #ffecc422;
+      border-top: 3.5px solid var(--accent);
+    }
     .site-footer a { color: #e2e8f0;}
-    .hint { color: var(--muted); font-size: .93rem; }
+    .hint {
+      color: var(--muted); font-size: .96rem; font-weight: 500;
+      letter-spacing: .05em;
+    }
     ul.breakdown { list-style: none; padding: 0; margin: 6px 0 0; }
-    ul.breakdown li { display: flex; align-items: center; justify-content: space-between; padding: 7px 0; border-bottom: 1px dashed var(--border); gap: 8px; }
+    ul.breakdown li {
+      display: flex; align-items: center; justify-content: space-between; padding: 7px 0;
+      border-bottom: 1px dashed var(--border); gap: 8px;
+      transition: background .14s;
+    }
     ul.breakdown li:last-child { border-bottom: 0; }
+    #cotizacionResumen {
+      border: 2px solid var(--border);
+      border-radius: 15px;
+      background:
+        radial-gradient(1200px 1200px at 100% -10%, rgba(234,88,12,.06), transparent 70%),
+        radial-gradient(1200px 1200px at -10% 100%, rgba(234,88,12,.06), transparent 70%),
+        #fffbeed9;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.06), inset 0 0 0 1px rgba(255,255,255,.6);
+      margin-bottom: 10px;
+      padding: 18px 18px 14px;
+      animation: fadeInSummary .5s cubic-bezier(.85,-.08,.22,1.09);
+    }
+    @keyframes fadeInSummary {0%{opacity:0;transform:translateY(16px) scale(.97);}100%{opacity:1;transform:none;}}
+    .quote-meta {
+      text-align: right;
+      font-size: .95rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      letter-spacing: .04em;
+    }
+    .quote-title {
+      font-size: 1.12rem; font-weight: 800; margin: 0 0 2px 0; color: var(--primary);
+      text-shadow: 0 1px 0 #fff, 0 2px 6px #ffecc47a;
+    }
+    .quote-footer {
+      margin-top: 10px; font-size: .95rem; color: var(--muted);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .quote-badge {
+      width: 42px; height: 42px; border-radius: 12px;
+      background: linear-gradient(135deg, #fff, #ffecc4); color: var(--primary);
+      display: grid; place-items: center; font-weight: 900; font-size: 1.3em;
+      box-shadow: 0 2px 8px #ffecc455, 0 1px 5px #fff4;
+      border: 2px solid var(--accent);
+      margin-right: 7px;
+    }
+    .divider { height: 1.2px; background: var(--border); margin: 12px 0 14px 0; border-radius: 2.4px;}
   </style>
+  <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
 </head>
 <body>
   <header class="site-header">
@@ -69,6 +223,8 @@
         <a href="#montura">Montura</a>
         <a href="#extras">Extras</a>
         <a href="#total">Total</a>
+        <a href="misionyvision.html">Misión y Visión</a>
+        <a href="redes.html">Redes</a>
       </nav>
     </div>
   </header>
@@ -205,12 +361,37 @@
       <div class="card" id="total">
         <div class="card-header">Total</div>
         <div id="cotizacionResumen">
-          <div class="total" id="precioTotal">MX$0.00</div>
-          <ul class="breakdown" id="detalleLista"></ul>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:5px;">
+            <div class="quote-badge">CM</div>
+            <div>
+              <div class="quote-title">Cotización personalizada</div>
+              <div class="hint">Montura + Textiles/Extras</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+              <div class="quote-meta">Fecha: <span id="quoteDate">—</span></div>
+              <div class="quote-meta">Moneda: MXN</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div class="hint" style="font-weight:700;">Precio total</div>
+            <div class="total" id="precioTotal">MX$0.00</div>
+          </div>
+          <div class="divider"></div>
+          <div>
+            <div class="hint" style="font-weight:700;">Detalle</div>
+            <ul class="breakdown" id="detalleLista"></ul>
+          </div>
+          <div class="divider"></div>
+          <div class="quote-footer">
+            <span>by: Empresa</span>
+            <span>Contacto: WhatsApp +52 722 612 8347</span>
+          </div>
         </div>
         <div class="actions">
           <button type="button" class="btn-outline" id="btnPdf">Descargar PDF</button>
-          <a class="btn" id="btnWhats" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
+          <button type="button" class="btn" id="btnPng">Descargar PNG</button>
+          <a class="btn-outline" id="btnWhats" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>
         </div>
         <div class="hint" style="margin-top:8px;">Los extras con “trabajo especial” requieren cotización directa con el artesano.</div>
       </div>
@@ -224,36 +405,11 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
-    // --- LÓGICA DE PRECIOS Y CÁLCULO ---
+    // Utilidad para formato dinero
     function money(n) { return (n || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }); }
 
-    // Base de precios
-    const BASE_PRICES = {
-      monturas: {
-        esqueleto_cola_pato: { cuero: 18000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' },
-        esqueleto_basto_cuadrado: { cuero: 20000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' },
-        cantinas_redondas_basto_mediano: { cuero: 22000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' },
-        cantinas_cuadradas_basto_mediano: { cuero: 22000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' },
-        cantinas_redondas_basto_grande: { cuero: 25000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' },
-        cantinas_cuadradas_basto_grande: { cuero: 25000, cuerno_toro: 3000, inox_blanco: 3500, inox_pavonado: 4500, fierro_aluminio: 9000, fierro_plata: 'trabajo especial' }
-      },
-      argollas_tapa: 1000,
-      estribos_tapadera: 1500,
-      extras: {
-        carona: {
-          cola_pato: 800, basto_cuadrado: 1000,
-          redondas_basto_mediano: 1200, cuadradas_basto_mediano: 1200,
-          redondas_basto_grande: 1500, cuadradas_basto_grande: 1500
-        },
-        zarape: { sencillo: 900, fino: 3500 },
-        cincha: 1200,
-        cuarta: 500,
-        jaquima: 2800,
-        cinturon: 900
-      }
-    };
+    let PRECIOS = null;
 
-    // --- DOM ---
     const form = document.getElementById('cotizadorForm');
     const medidaFuste = document.getElementById('medidaFuste');
     const medidaError = document.getElementById('medidaError');
@@ -264,21 +420,65 @@
     const argTapaHint = document.getElementById('argTapaHint');
     const btnWhats = document.getElementById('btnWhats');
     const btnPdf = document.getElementById('btnPdf');
+    const btnPng = document.getElementById('btnPng');
     const precioTotalEl = document.getElementById('precioTotal');
     const detalleLista = document.getElementById('detalleLista');
+    const quoteDateEl = document.getElementById('quoteDate');
+    const cotizacionResumen = document.getElementById('cotizacionResumen');
 
-    // --- FUNCIONES ---
-    function isTrabajoEspecialFuste(medida) {
-      return parseFloat(medida) >= 16.5;
+    async function loadPrices() {
+      try {
+        const res = await fetch('precios.json?ts=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error("No se pudo cargar precios");
+        PRECIOS = await res.json();
+      } catch (e) {
+        alert("No se pudo cargar precios.json. El cotizador no funcionará correctamente.");
+        PRECIOS = null;
+      } finally {
+        calcular();
+      }
     }
-    function isFusteMenor14(medida) {
-      return parseFloat(medida) < 14;
+
+    function getCuerajePrice(cuerajeVal, herrajeVal) {
+      // Map cueraje select value to precios.json
+      // cuerajeVal: "cantinas_redondas_basto_mediano" etc.
+      if (!PRECIOS) return { base: 0, delta: 0, especial: false };
+      let base = 0;
+      let extra = 0;
+      let especial = false;
+      let cuerajeKey, bastoKey, formaKey;
+      if (/cantinas|bastos/.test(cuerajeVal)) {
+        // Ejemplo: cantinas_redondas_basto_grande
+        let parts = cuerajeVal.split('_'); // ["cantinas", "redondas", "basto", "grande"]
+        cuerajeKey = parts[0];
+        formaKey = parts[1];
+        bastoKey = parts[3] === "grande" ? "grande" : "mediano";
+        base = PRECIOS.cueraje?.[cuerajeKey]?.[bastoKey]?.[formaKey] ?? 0;
+      } else if (/esqueleto/.test(cuerajeVal)) {
+        if (cuerajeVal === "esqueleto_basto_cuadrado") {
+          base = PRECIOS.cueraje?.esqueleto?.basto_cuadrado ?? 0;
+        } else if (cuerajeVal === "esqueleto_cola_pato") {
+          base = PRECIOS.cueraje?.esqueleto?.cola_pato ?? 0;
+        }
+      }
+      // Herraje delta
+      let hmap = {
+        "cuero": "cuero",
+        "cuerno_toro": "cuerno",
+        "inox_blanco": "inox_blanco",
+        "inox_pavonado": "inox_pavonado",
+        "fierro_aluminio": "fierro_aluminio",
+        "fierro_plata": "fierro_plata"
+      };
+      let herrajeKey = hmap[herrajeVal];
+      let delta = PRECIOS.herraje?.estilos?.[herrajeKey];
+      if (herrajeVal === "fierro_plata") especial = true;
+      if (delta === undefined || delta === null || delta === "pendiente") delta = 0;
+      return { base, delta, especial };
     }
-    function getSelected(name) {
-      const checked = form.querySelector(`[name="${name}"]:checked`);
-      return checked ? checked.value : '';
-    }
+
     function calcular() {
+      if (!PRECIOS) return;
       let items = [];
       let total = 0;
       let trabajoEspecial = false;
@@ -289,12 +489,11 @@
       const medida = form.medidaFuste.value;
       let fusteDesc = `Fuste: ${fusteEstilo === 'saldivar' ? 'Saldívar' : 'Buchón'} - ${medida}"`;
       let fusteError = "";
-
-      if (isTrabajoEspecialFuste(medida)) {
+      if (parseFloat(medida) >= 16.5) {
         fusteError = 'Fustes de 16.5" o más se cotizan aparte por mensaje directo (trabajo especial).';
         trabajoEspecial = true;
       }
-      if (isFusteMenor14(medida)) {
+      if (parseFloat(medida) < 14) {
         fusteDesc += " (costo incluido)";
       }
       items.push({ text: fusteDesc, price: 0 });
@@ -303,60 +502,33 @@
 
       // Cueraje + Herraje
       const cuerajeVal = cueraje.value;
-      let cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
-      let herraje = herrajeEstilo.value;
-      let basePrice = BASE_PRICES.monturas[cuerajeVal]?.cuero || 0;
-      let herrajeDelta = 0;
-      let herrajeText = "";
-      let argTapaDisp = false;
-      let argTapaLabel = "";
-      let isHerrajeEspecial = false;
-
-      // Herraje
-      switch (herraje) {
-        case "cuero": herrajeDelta = 0; herrajeText = "Herraje: cuero"; break;
-        case "cuerno_toro": herrajeDelta = 3000; herrajeText = "Herraje: cuerno de toro (+$3,000)"; break;
-        case "inox_blanco": herrajeDelta = 3500; herrajeText = "Herraje: acero inoxidable blanco (+$3,500)"; argTapaDisp = true; break;
-        case "inox_pavonado": herrajeDelta = 4500; herrajeText = "Herraje: acero inoxidable pavonado (+$4,500)"; argTapaDisp = true; break;
-        case "fierro_aluminio": herrajeDelta = 9000; herrajeText = "Herraje: fierro incrustado de aluminio (+$9,000)"; argTapaDisp = true; break;
-        case "fierro_plata": herrajeDelta = 0; herrajeText = "Herraje: fierro incrustado de plata (trabajo especial)"; argTapaDisp = true; isHerrajeEspecial = true; trabajoEspecial = true; break;
-      }
-
-      // Argollas de tapa
-      let argTapa = argollasTapa.checked;
-      let argTapaPrecio = 0;
-      if (argTapa) {
-        if (["inox_blanco","inox_pavonado","fierro_aluminio","fierro_plata"].includes(herraje)) {
-          argTapaPrecio = BASE_PRICES.argollas_tapa;
-          argTapaLabel = "Con argollas de tapa";
-        } else {
-          argTapa = false; // No permitido
-        }
+      const cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
+      const herrajeVal = herrajeEstilo.value;
+      const { base, delta, especial } = getCuerajePrice(cuerajeVal, herrajeVal);
+      let herrajeGreca = form.herrajeGreca.value;
+      let argTapaDisp = ["inox_blanco", "inox_pavonado", "fierro_aluminio", "fierro_plata"].includes(herrajeVal);
+      let argTapa = argollasTapa.checked && argTapaDisp;
+      let argTapaPrecio = argTapa ? (PRECIOS.herraje?.argollas_tapa ?? 1000) : 0;
+      let detalleHerraje = `${cuerajeLabel} con Herraje: ${herrajeEstilo.options ? herrajeEstilo.options[herrajeEstilo.selectedIndex].textContent : herrajeVal} — Greca ${herrajeGreca}`;
+      if (argTapa) detalleHerraje += " — Argollas de tapa";
+      if (especial) {
+        detalleHerraje += " (trabajo especial, cotizar con artesano)";
+        items.push({ text: detalleHerraje, price: 0 });
+        trabajoEspecial = true;
+      } else {
+        items.push({ text: detalleHerraje, price: base + delta + argTapaPrecio });
       }
       argollasTapa.disabled = !argTapaDisp;
       argTapaHint.textContent = argTapaDisp ? "" : "Solo disponible con herraje de acero inoxidable, fierro de aluminio o plata.";
 
-      // Trabajo especial herraje
-      if (isHerrajeEspecial) {
-        herrajeText += ". Se cotiza directo con el artesano.";
-        cotizarDirecto.push("Herraje de plata");
-      }
-
-      // Precio cueraje+herraje
-      let cuerajePrecio = isHerrajeEspecial ? 0 : (basePrice + herrajeDelta + argTapaPrecio);
-      let detalleHerraje = `${cuerajeLabel} con ${herrajeText}` + (argTapa ? ", argollas de tapa (+$1,000)" : "");
-
-      items.push({ text: detalleHerraje, price: cuerajePrecio });
-
       // Cliente manda fuste
       if (form.clienteMandaFuste.checked) {
-        items.push({ text: "El cliente envía su fuste", price: -1000 });
+        items.push({ text: "El cliente envía su fuste", price: - (PRECIOS.fuste?.descuentoClienteManda ?? 1000) });
       }
 
       // Arciones
       let arcEstilo = getSelected("arcEstilo");
       let arcTipo = getSelected("arcTipo");
-      // Solo esqueleto_cola_pato y esqueleto_basto_cuadrado pueden escoger tipo, el resto rectas
       let tipoFijo = !["esqueleto_cola_pato", "esqueleto_basto_cuadrado"].includes(cuerajeVal);
       if (tipoFijo) {
         arcTipo = "recta";
@@ -369,39 +541,31 @@
 
       // Estribos
       let estribos = getSelected("estribos");
-      let estrPrice = estribos === "tapadera" ? BASE_PRICES.estribos_tapadera : 0;
+      let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
       let estrDesc = estribos === "tapadera" ? "Estribos de tapadera (+$1,500)" : "Estribos abiertos (incluidos)";
       items.push({ text: estrDesc, price: estrPrice });
 
       // ---- EXTRAS ----
-      // Carona
       let caronaVal = form.carona.value;
-      if (caronaVal && BASE_PRICES.extras.carona[caronaVal]) {
-        let price = BASE_PRICES.extras.carona[caronaVal];
+      if (caronaVal && PRECIOS.carona && PRECIOS.carona[caronaVal] !== undefined) {
+        let price = PRECIOS.carona[caronaVal];
         items.push({ text: `Carona (${caronaVal.replace(/_/g, ' ')})`, price });
       }
-      // Zarape
       let zarape = getSelected("zarape");
-      if (zarape && zarape !== "") {
-        let price = BASE_PRICES.extras.zarape[zarape];
+      if (zarape && zarape !== "" && PRECIOS.zarape && PRECIOS.zarape[zarape] !== undefined) {
+        let price = PRECIOS.zarape[zarape];
         items.push({ text: `Zarape ${zarape === "fino" ? "fino" : "sencillo"}`, price });
       }
-      // Cincha
       if (form.cincha.checked) {
         let medida = form.cinchaMedida.value ? ` (${form.cinchaMedida.value}cm)` : "";
-        items.push({ text: "Cincha" + medida, price: BASE_PRICES.extras.cincha });
+        items.push({ text: "Cincha" + medida, price: PRECIOS.extras?.cincha ?? 1200 });
       }
-      // Cuarta
-      if (form.cuarta.checked) items.push({ text: "Cuarta estándar", price: BASE_PRICES.extras.cuarta });
-      // Jaquima
-      if (form.jaquima.checked) items.push({ text: "Jáquima / Bozalillo", price: BASE_PRICES.extras.jaquima });
-      // Cinturón
+      if (form.cuarta.checked) items.push({ text: "Cuarta estándar", price: PRECIOS.extras?.cuarta ?? 500 });
+      if (form.jaquima.checked) items.push({ text: "Jáquima / Bozalillo", price: PRECIOS.extras?.jaquima ?? 2800 });
       if (form.cinturon.checked) {
         let talla = form.cinturonTalla.value ? ` (talla ${form.cinturonTalla.value})` : "";
-        items.push({ text: "Cinturón de piel cosido a mano" + talla, price: BASE_PRICES.extras.cinturon });
+        items.push({ text: "Cinturón de piel cosido a mano" + talla, price: PRECIOS.extras?.cinturon ?? 900 });
       }
-
-      // Extras a cotizar directo
       [
         {id:"hebilla", label:"Hebilla del cinturón"},
         {id:"espuelas", label:"Espuelas"},
@@ -415,28 +579,45 @@
         }
       });
 
-      // Mostrar resumen y total
-      detalleLista.innerHTML = items.map(it => `<li><span>${it.text}</span><strong>${it.price !== 0 ? money(it.price) : (trabajoEspecial && it.price === 0 ? "trabajo especial" : "$0")}</strong></li>`).join("");
+      detalleLista.innerHTML = items.map(it => {
+        let precioTexto = "";
+        if (trabajoEspecial && it.price === 0) precioTexto = "trabajo especial";
+        else if (it.price === 0) precioTexto = "Incluido";
+        else precioTexto = money(it.price);
+        return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
+      }).join("");
       total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
       precioTotalEl.textContent = money(total);
 
       // WhatsApp
       const phone = '527226128347';
-      let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number" ? money(it.price) : it.price}`).join('\n');
+      let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
+        ? (it.price === 0 ? "Incluido" : money(it.price))
+        : it.price}`).join('\n');
       let text = encodeURIComponent(
         `Hola, te comparto la cotización:\n\n${resumenTxt}\n\nTotal: ${money(total)}\n\n${cotizarDirecto.length ? 'Requiere cotización directa de: ' + cotizarDirecto.join(', ') : ''}`
       );
       btnWhats.href = `https://wa.me/${phone}?text=${text}`;
     }
 
-    // --- EVENTOS ---
-    form.addEventListener('input', calcular);
-    form.addEventListener('change', calcular);
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn, .btn-outline');
+      if (!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const d = Math.max(btn.clientWidth, btn.clientHeight);
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.width = ripple.style.height = d + 'px';
+      ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
+      ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
+      const old = btn.querySelector('.ripple');
+      if (old) old.remove();
+      btn.appendChild(ripple);
+    }, { passive: true });
 
-    // PDF
     btnPdf.addEventListener('click', async () => {
-      const area = document.getElementById('cotizacionResumen');
-      const canvas = await html2canvas(area, { scale: 2 });
+      cotizacionResumen.style.background = '#fffbeed9';
+      const canvas = await html2canvas(cotizacionResumen, { scale: 2, useCORS: true, backgroundColor: null });
       const imgData = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -459,8 +640,33 @@
       pdf.save(`cotizacion-montura-${stamp}.pdf`);
     });
 
-    // Inicializar
-    calcular();
+    btnPng.addEventListener('click', async () => {
+      cotizacionResumen.style.background = '#fffbeed9';
+      const canvas = await html2canvas(cotizacionResumen, { scale: 2, useCORS: true, backgroundColor: null });
+      const dataUrl = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      const now = new Date();
+      const pad = (n) => String(n).padStart(2, '0');
+      const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+      a.download = `cotizacion-montura-${stamp}.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    function setQuoteDate() {
+      if (!quoteDateEl) return;
+      const now = new Date();
+      quoteDateEl.textContent = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(now);
+    }
+    setQuoteDate();
+
+    form.addEventListener('input', calcular);
+    form.addEventListener('change', calcular);
+
+    loadPrices();
+    setInterval(setQuoteDate, 60000);
   </script>
 </body>
 </html>
