@@ -405,9 +405,7 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
   <script>
-    // Utilidad para formato dinero
     function money(n) { return (n || 0).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }); }
-
     let PRECIOS = null;
 
     const form = document.getElementById('cotizadorForm');
@@ -426,13 +424,27 @@
     const quoteDateEl = document.getElementById('quoteDate');
     const cotizacionResumen = document.getElementById('cotizacionResumen');
 
+    function getPreciosJsonUrl() {
+      let path = window.location.pathname;
+      if (path.endsWith('/')) path += 'index.html';
+      let preciosPath = 'precios.json';
+      if (path.match(/\/files\//)) preciosPath = 'precios.json';
+      return preciosPath + '?ts=' + Date.now();
+    }
+
     async function loadPrices() {
       try {
-        const res = await fetch('precios.json?ts=' + Date.now(), { cache: 'no-store' });
-        if (!res.ok) throw new Error("No se pudo cargar precios");
+        if (window.location.protocol === "file:") {
+          alert("No puedes usar el cotizador abriendo el HTML directamente. Usa un servidor local HTTP (Live Server, Python, XAMPP, etc).");
+          PRECIOS = null;
+          return;
+        }
+        const preciosUrl = getPreciosJsonUrl();
+        const res = await fetch(preciosUrl, { cache: 'no-store' });
+        if (!res.ok) throw new Error("No se pudo cargar precios.json");
         PRECIOS = await res.json();
       } catch (e) {
-        alert("No se pudo cargar precios.json. El cotizador no funcionará correctamente.");
+        alert("No se pudo cargar precios.json, verifica la ruta, el servidor y que el archivo sea válido.");
         PRECIOS = null;
       } finally {
         calcular();
@@ -440,16 +452,13 @@
     }
 
     function getCuerajePrice(cuerajeVal, herrajeVal) {
-      // Map cueraje select value to precios.json
-      // cuerajeVal: "cantinas_redondas_basto_mediano" etc.
       if (!PRECIOS) return { base: 0, delta: 0, especial: false };
       let base = 0;
       let extra = 0;
       let especial = false;
       let cuerajeKey, bastoKey, formaKey;
       if (/cantinas|bastos/.test(cuerajeVal)) {
-        // Ejemplo: cantinas_redondas_basto_grande
-        let parts = cuerajeVal.split('_'); // ["cantinas", "redondas", "basto", "grande"]
+        let parts = cuerajeVal.split('_');
         cuerajeKey = parts[0];
         formaKey = parts[1];
         bastoKey = parts[3] === "grande" ? "grande" : "mediano";
@@ -461,7 +470,6 @@
           base = PRECIOS.cueraje?.esqueleto?.cola_pato ?? 0;
         }
       }
-      // Herraje delta
       let hmap = {
         "cuero": "cuero",
         "cuerno_toro": "cuerno",
@@ -484,7 +492,6 @@
       let trabajoEspecial = false;
       let cotizarDirecto = [];
 
-      // Fuste
       const fusteEstilo = form.fusteEstilo.value;
       const medida = form.medidaFuste.value;
       let fusteDesc = `Fuste: ${fusteEstilo === 'saldivar' ? 'Saldívar' : 'Buchón'} - ${medida}"`;
@@ -500,7 +507,6 @@
       medidaError.style.display = fusteError ? 'block' : 'none';
       medidaError.textContent = fusteError;
 
-      // Cueraje + Herraje
       const cuerajeVal = cueraje.value;
       const cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
       const herrajeVal = herrajeEstilo.value;
@@ -521,12 +527,10 @@
       argollasTapa.disabled = !argTapaDisp;
       argTapaHint.textContent = argTapaDisp ? "" : "Solo disponible con herraje de acero inoxidable, fierro de aluminio o plata.";
 
-      // Cliente manda fuste
       if (form.clienteMandaFuste.checked) {
         items.push({ text: "El cliente envía su fuste", price: - (PRECIOS.fuste?.descuentoClienteManda ?? 1000) });
       }
 
-      // Arciones
       let arcEstilo = getSelected("arcEstilo");
       let arcTipo = getSelected("arcTipo");
       let tipoFijo = !["esqueleto_cola_pato", "esqueleto_basto_cuadrado"].includes(cuerajeVal);
@@ -539,13 +543,11 @@
       let arcDesc = `Arciones: ${arcEstilo === "doble" ? "Dobles" : "Sencillas"} - ${arcTipo === "sudadera" ? "Sudadera" : "Rectas"}`;
       items.push({ text: arcDesc, price: 0 });
 
-      // Estribos
       let estribos = getSelected("estribos");
       let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
       let estrDesc = estribos === "tapadera" ? "Estribos de tapadera (+$1,500)" : "Estribos abiertos (incluidos)";
       items.push({ text: estrDesc, price: estrPrice });
 
-      // ---- EXTRAS ----
       let caronaVal = form.carona.value;
       if (caronaVal && PRECIOS.carona && PRECIOS.carona[caronaVal] !== undefined) {
         let price = PRECIOS.carona[caronaVal];
@@ -589,7 +591,6 @@
       total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
       precioTotalEl.textContent = money(total);
 
-      // WhatsApp
       const phone = '527226128347';
       let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
         ? (it.price === 0 ? "Incluido" : money(it.price))
@@ -661,6 +662,11 @@
       quoteDateEl.textContent = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(now);
     }
     setQuoteDate();
+
+    function getSelected(name) {
+      const checked = form.querySelector(`[name="${name}"]:checked`);
+      return checked ? checked.value : '';
+    }
 
     form.addEventListener('input', calcular);
     form.addEventListener('change', calcular);
