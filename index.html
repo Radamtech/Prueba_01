@@ -601,54 +601,63 @@
       btnWhats.href = `https://wa.me/${phone}?text=${text}`;
     }
 
-    document.addEventListener('click', function (e) {
-      const btn = e.target.closest('.btn, .btn-outline');
-      if (!btn) return;
-      const rect = btn.getBoundingClientRect();
-      const d = Math.max(btn.clientWidth, btn.clientHeight);
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      ripple.style.width = ripple.style.height = d + 'px';
-      ripple.style.left = (e.clientX - rect.left - d / 2) + 'px';
-      ripple.style.top = (e.clientY - rect.top - d / 2) + 'px';
-      const old = btn.querySelector('.ripple');
-      if (old) old.remove();
-      btn.appendChild(ripple);
-    }, { passive: true });
-
+    // PDF mejorado
     btnPdf.addEventListener('click', async () => {
-      cotizacionResumen.style.background = '#fffbeed9';
-      const canvas = await html2canvas(cotizacionResumen, { scale: 2, useCORS: true, backgroundColor: null });
+      const area = document.getElementById('cotizacionResumen');
+      const prevBg = area.style.background;
+      const prevFont = area.style.fontFamily;
+      area.style.background = '#fff';
+      area.style.fontFamily = "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial";
+      await new Promise(res => setTimeout(res, 80));
+      const canvas = await html2canvas(area, {
+        scale: 2,
+        backgroundColor: '#fff',
+        useCORS: true
+      });
+      area.style.background = prevBg;
+      area.style.fontFamily = prevFont;
       const imgData = canvas.toDataURL('image/png');
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
-      const imgWidthPx = canvas.width;
-      const imgHeightPx = canvas.height;
       const maxW = pageWidth - margin * 2;
       const maxH = pageHeight - margin * 2;
-      const ratio = Math.min(maxW / imgWidthPx, maxH / imgHeightPx);
-      const imgW = imgWidthPx * ratio;
-      const imgH = imgHeightPx * ratio;
-      const x = (pageWidth - imgW) / 2;
-      const y = (pageHeight - imgH) / 2;
-      pdf.addImage(imgData, 'PNG', x, y, imgW, imgH);
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = Math.min(maxW / imgWidth, maxH / imgHeight);
+      const pdfW = imgWidth * ratio;
+      const pdfH = imgHeight * ratio;
+      const x = (pageWidth - pdfW) / 2;
+      const y = (pageHeight - pdfH) / 2;
+      pdf.addImage(imgData, 'PNG', x, y, pdfW, pdfH);
       const now = new Date();
-      const pad = (n) => String(n).padStart(2, '0');
+      const pad = n => String(n).padStart(2, '0');
       const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
       pdf.save(`cotizacion-montura-${stamp}.pdf`);
     });
 
+    // PNG mejorado
     btnPng.addEventListener('click', async () => {
-      cotizacionResumen.style.background = '#fffbeed9';
-      const canvas = await html2canvas(cotizacionResumen, { scale: 2, useCORS: true, backgroundColor: null });
+      const area = document.getElementById('cotizacionResumen');
+      const prevBg = area.style.background;
+      const prevFont = area.style.fontFamily;
+      area.style.background = '#fff';
+      area.style.fontFamily = "'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial";
+      await new Promise(res => setTimeout(res, 80));
+      const canvas = await html2canvas(area, {
+        scale: 2,
+        backgroundColor: '#fff',
+        useCORS: true
+      });
+      area.style.background = prevBg;
+      area.style.fontFamily = prevFont;
       const dataUrl = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = dataUrl;
       const now = new Date();
-      const pad = (n) => String(n).padStart(2, '0');
+      const pad = n => String(n).padStart(2, '0');
       const stamp = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
       a.download = `cotizacion-montura-${stamp}.png`;
       document.body.appendChild(a);
