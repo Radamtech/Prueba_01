@@ -589,7 +589,7 @@
       }).join("");
       total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
       precioTotalEl.textContent = money(total);
-
+//                  Numero de contacto a donde se envia la cotización            //
       const phone = '527226128347';
       let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
         ? (it.price === 0 ? "Incluido" : money(it.price))
@@ -600,7 +600,6 @@
       btnWhats.href = `https://wa.me/${phone}?text=${text}`;
     }
 
-    // Ripple efecto botones
     document.addEventListener('click', function (e) {
       const btn = e.target.closest('.btn, .btn-outline');
       if (!btn) return;
@@ -616,7 +615,6 @@
       btn.appendChild(ripple);
     }, { passive: true });
 
-    // --- EXPORTACIÓN PDF/PNG SOLO DEL CUADRO DE COTIZACIÓN ---
     function forceExportStyles(el) {
       el.style.background = '#fff';
       el.style.backgroundColor = '#fff';
