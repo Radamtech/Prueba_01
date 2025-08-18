@@ -640,22 +640,28 @@
       let total = 0;
       let trabajoEspecial = false;
       let cotizarDirecto = [];
-
+    
       const fusteEstilo = form.fusteEstilo.value;
-      const medida = form.medidaFuste.value;
+      const medida = parseFloat(form.medidaFuste.value);
+    
+      // Detectar si la medida requiere trabajo especial
+      let especialPorMedida = medida > 16.5;
+    
+      // FUSTE
       let fusteDesc = `Fuste: ${fusteEstilo === 'saldivar' ? 'Saldívar' : 'Buchón'} - ${medida}"`;
       let fusteError = "";
-      if (parseFloat(medida) >= 16.5) {
-        fusteError = 'Fustes de 16.5" o más se cotizan aparte por mensaje directo (trabajo especial).';
+      if (especialPorMedida) {
+        fusteDesc += " (trabajo especial, cotizar con artesano)";
         trabajoEspecial = true;
-      }
-      if (parseFloat(medida) < 14) {
+      } else if (medida < 14) {
         fusteDesc += " (costo incluido)";
       }
       items.push({ text: fusteDesc, price: 0 });
-      medidaError.style.display = fusteError ? 'block' : 'none';
-      medidaError.textContent = fusteError;
-
+    
+      medidaError.style.display = especialPorMedida ? 'block' : 'none';
+      medidaError.textContent = especialPorMedida ? 'Fustes de más de 16.5" se cotizan como trabajo especial.' : '';
+    
+      // CUERAJE + HERRAJE
       const cuerajeVal = cueraje.value;
       const cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
       const herrajeVal = herrajeEstilo.value;
@@ -666,7 +672,7 @@
       let argTapaPrecio = argTapa ? (PRECIOS.herraje?.argollas_tapa ?? 1000) : 0;
       let detalleHerraje = `${cuerajeLabel} con Herraje: ${herrajeEstilo.options ? herrajeEstilo.options[herrajeEstilo.selectedIndex].textContent : herrajeVal} — Greca ${herrajeGreca}`;
       if (argTapa) detalleHerraje += " — Argollas de tapa";
-      if (especial) {
+      if (especialPorMedida || especial) {
         detalleHerraje += " (trabajo especial, cotizar con artesano)";
         items.push({ text: detalleHerraje, price: 0 });
         trabajoEspecial = true;
@@ -675,11 +681,13 @@
       }
       argollasTapa.disabled = !argTapaDisp;
       argTapaHint.textContent = argTapaDisp ? "" : "Solo disponible con herraje de acero inoxidable, fierro de aluminio o plata.";
-
-      if (form.clienteMandaFuste.checked) {
+    
+      // DESCUENTO por mandar fuste
+      if (form.clienteMandaFuste.checked && !especialPorMedida) {
         items.push({ text: "El cliente envía su fuste", price: - (PRECIOS.fuste?.descuentoClienteManda ?? 1000) });
       }
-
+    
+      // ARCIONES
       let arcEstilo = getSelected("arcEstilo");
       let arcTipo = getSelected("arcTipo");
       let tipoFijo = !["esqueleto_cola_pato", "esqueleto_basto_cuadrado"].includes(cuerajeVal);
@@ -690,13 +698,25 @@
         arcTipoHint.textContent = "";
       }
       let arcDesc = `Arciones: ${arcEstilo === "doble" ? "Dobles" : "Sencillas"} - ${arcTipo === "sudadera" ? "Sudadera" : "Rectas"}`;
-      items.push({ text: arcDesc, price: 0 });
-
+      if (especialPorMedida) {
+        arcDesc += " (trabajo especial, cotizar con artesano)";
+        items.push({ text: arcDesc, price: 0 });
+      } else {
+        items.push({ text: arcDesc, price: 0 });
+      }
+    
+      // ESTRIBOS
       let estribos = getSelected("estribos");
-      let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
       let estrDesc = estribos === "tapadera" ? "Estribos de tapadera (+$1,500)" : "Estribos abiertos (incluidos)";
-      items.push({ text: estrDesc, price: estrPrice });
-
+      if (especialPorMedida) {
+        estrDesc += " (trabajo especial, cotizar con artesano)";
+        items.push({ text: estrDesc, price: 0 });
+      } else {
+        let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
+        items.push({ text: estrDesc, price: estrPrice });
+      }
+    
+      // EXTRAS Y TEXTILES (esto queda igual)
       let caronaVal = form.carona.value;
       if (caronaVal && PRECIOS.carona && PRECIOS.carona[caronaVal] !== undefined) {
         let price = PRECIOS.carona[caronaVal];
@@ -708,8 +728,8 @@
         items.push({ text: `Zarape ${zarape === "fino" ? "fino" : "sencillo"}`, price });
       }
       if (form.cincha.checked) {
-        let medida = form.cinchaMedida.value ? ` (${form.cinchaMedida.value}cm)` : "";
-        items.push({ text: "Cincha" + medida, price: PRECIOS.extras?.cincha ?? 1200 });
+        let medidaCincha = form.cinchaMedida.value ? ` (${form.cinchaMedida.value}cm)` : "";
+        items.push({ text: "Cincha" + medidaCincha, price: PRECIOS.extras?.cincha ?? 1200 });
       }
       if (form.cuarta.checked) items.push({ text: "Cuarta estándar", price: PRECIOS.extras?.cuarta ?? 500 });
       if (form.jaquima.checked) items.push({ text: "Jáquima / Bozalillo", price: PRECIOS.extras?.jaquima ?? 2800 });
@@ -729,24 +749,19 @@
           cotizarDirecto.push(item.label);
         }
       });
-
-  detalleLista.innerHTML = items.map(it => {
-  let precioTexto = "";
-  // Si el texto del item contiene "trabajo especial" o tiene la propiedad especial, muestra "Trabajo Especial"
-  if ((it.text && it.text.toLowerCase().includes("trabajo especial")) || (typeof it.especial !== "undefined" && it.especial)) {
-    precioTexto = "Trabajo Especial";
-  }
-  else if (it.price === 0) {
-    precioTexto = "Incluido";
-  }
-  else {
-    precioTexto = money(it.price);
-  }
-  return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
-}).join("");
+    
+      // Actualizar el resto de la UI (igual que antes)
+      detalleLista.innerHTML = items.map(it => {
+        let precioTexto = "";
+        if ((trabajoEspecial || especialPorMedida) && it.price === 0 && it.text.includes("trabajo especial")) precioTexto = "trabajo especial";
+        else if (it.price === 0) precioTexto = "Incluido";
+        else precioTexto = money(it.price);
+        return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
+      }).join("");
       total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
-precioTotalEl.textContent = money(total);
-//                  Numero de contacto a donde se envia la cotización            //
+      precioTotalEl.textContent = money(total);
+    
+      // WhatsApp
       const phone = '529515576911';
       let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
         ? (it.price === 0 ? "Incluido" : money(it.price))
