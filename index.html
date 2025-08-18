@@ -744,6 +744,8 @@
   }
   return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
 }).join("");
+      total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
+precioTotalEl.textContent = money(total);
 //                  Numero de contacto a donde se envia la cotización            //
       const phone = '529515576911';
       let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
