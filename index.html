@@ -382,17 +382,54 @@
         </div>
         <div class="field">
           <label for="medidaFuste">Fuste - Medida <span class="hint">(en pulgadas, ej: 14, 14.5, 15...)</span></label>
-          <select id="medidaFuste" name="medidaFuste">
-            <option value="13.5">-14</option>
-            <option value="14">14</option>
-            <option value="14.5">14.5</option>
-            <option value="15">15</option>
-            <option value="15.5">15.5</option>
-            <option value="16">16</option>
-            <option value="16.5">16.5</option>
-            <option value="17">17</option>
-            <option value="18">18</option>
-          </select>
+<select id="medidaFuste" name="medidaFuste">
+  <!-- Opciones de 8 a 30, de 0.5 en 0.5 -->
+  <option value="8">8"</option>
+  <option value="8.5">8.5"</option>
+  <option value="9">9"</option>
+  <option value="9.5">9.5"</option>
+  <option value="10">10"</option>
+  <option value="10.5">10.5"</option>
+  <option value="11">11"</option>
+  <option value="11.5">11.5"</option>
+  <option value="12">12"</option>
+  <option value="12.5">12.5"</option>
+  <option value="13">13"</option>
+  <option value="13.5">13.5"</option>
+  <option value="14">14"</option>
+  <option value="14.5">14.5"</option>
+  <option value="15">15"</option>
+  <option value="15.5">15.5"</option>
+  <option value="16">16"</option>
+  <option value="16.5">16.5"</option>
+  <option value="17">17"</option>
+  <option value="17.5">17.5"</option>
+  <option value="18">18"</option>
+  <option value="18.5">18.5"</option>
+  <option value="19">19"</option>
+  <option value="19.5">19.5"</option>
+  <option value="20">20"</option>
+  <option value="20.5">20.5"</option>
+  <option value="21">21"</option>
+  <option value="21.5">21.5"</option>
+  <option value="22">22"</option>
+  <option value="22.5">22.5"</option>
+  <option value="23">23"</option>
+  <option value="23.5">23.5"</option>
+  <option value="24">24"</option>
+  <option value="24.5">24.5"</option>
+  <option value="25">25"</option>
+  <option value="25.5">25.5"</option>
+  <option value="26">26"</option>
+  <option value="26.5">26.5"</option>
+  <option value="27">27"</option>
+  <option value="27.5">27.5"</option>
+  <option value="28">28"</option>
+  <option value="28.5">28.5"</option>
+  <option value="29">29"</option>
+  <option value="29.5">29.5"</option>
+  <option value="30">30"</option>
+</select>
           <div id="medidaError" class="error"></div>
         </div>
         <div class="field">
@@ -624,102 +661,143 @@
       if (delta === undefined || delta === null || delta === "pendiente") delta = 0;
       return { base, delta, especial };
     }
+function calcular() {
+  if (!PRECIOS) return;
+  let items = [];
+  let total = 0;
+  let trabajoEspecial = false;
+  let cotizarDirecto = [];
 
-    function calcular() {
-      if (!PRECIOS) return;
-      let items = [];
-      let total = 0;
-      let trabajoEspecial = false;
-      let cotizarDirecto = [];
+  const fusteEstilo = form.fusteEstilo.value;
+  const medida = parseFloat(form.medidaFuste.value);
 
-      const fusteEstilo = form.fusteEstilo.value;
-      const medida = form.medidaFuste.value;
-      let fusteDesc = `Fuste: ${fusteEstilo === 'saldivar' ? 'Saldívar' : 'Buchón'} - ${medida}"`;
-      let fusteError = "";
-      if (parseFloat(medida) >= 16.5) {
-        fusteError = 'Fustes de 16.5" o más se cotizan aparte por mensaje directo (trabajo especial).';
-        trabajoEspecial = true;
-      }
-      if (parseFloat(medida) < 14) {
-        fusteDesc += " (costo incluido)";
-      }
-      items.push({ text: fusteDesc, price: 0 });
-      medidaError.style.display = fusteError ? 'block' : 'none';
-      medidaError.textContent = fusteError;
+  // Detectar si la medida requiere trabajo especial
+  let especialPorMedida = medida > 16.5;
 
-      const cuerajeVal = cueraje.value;
-      const cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
-      const herrajeVal = herrajeEstilo.value;
-      const { base, delta, especial } = getCuerajePrice(cuerajeVal, herrajeVal);
-      let herrajeGreca = form.herrajeGreca.value;
-      let argTapaDisp = ["inox_blanco", "inox_pavonado", "fierro_aluminio", "fierro_plata"].includes(herrajeVal);
-      let argTapa = argollasTapa.checked && argTapaDisp;
-      let argTapaPrecio = argTapa ? (PRECIOS.herraje?.argollas_tapa ?? 1000) : 0;
-      let detalleHerraje = `${cuerajeLabel} con Herraje: ${herrajeEstilo.options ? herrajeEstilo.options[herrajeEstilo.selectedIndex].textContent : herrajeVal} — Greca ${herrajeGreca}`;
-      if (argTapa) detalleHerraje += " — Argollas de tapa";
-      if (especial) {
-        detalleHerraje += " (trabajo especial, cotizar con artesano)";
-        items.push({ text: detalleHerraje, price: 0 });
-        trabajoEspecial = true;
-      } else {
-        items.push({ text: detalleHerraje, price: base + delta + argTapaPrecio });
-      }
-      argollasTapa.disabled = !argTapaDisp;
-      argTapaHint.textContent = argTapaDisp ? "" : "Solo disponible con herraje de acero inoxidable, fierro de aluminio o plata.";
+  // FUSTE
+  let fusteDesc = `Fuste: ${fusteEstilo === 'saldivar' ? 'Saldívar' : 'Buchón'} - ${medida}"`;
+  let fusteError = "";
+  if (especialPorMedida) {
+    fusteDesc += " (trabajo especial, cotizar con artesano)";
+    trabajoEspecial = true;
+  } else if (medida < 14) {
+    fusteDesc += " (costo incluido)";
+  }
+  items.push({ text: fusteDesc, price: 0 });
 
-      if (form.clienteMandaFuste.checked) {
-        items.push({ text: "El cliente envía su fuste", price: - (PRECIOS.fuste?.descuentoClienteManda ?? 1000) });
-      }
+  medidaError.style.display = especialPorMedida ? 'block' : 'none';
+  medidaError.textContent = especialPorMedida ? 'Fustes de más de 16.5" se cotizan como trabajo especial.' : '';
 
-      let arcEstilo = getSelected("arcEstilo");
-      let arcTipo = getSelected("arcTipo");
-      let tipoFijo = !["esqueleto_cola_pato", "esqueleto_basto_cuadrado"].includes(cuerajeVal);
-      if (tipoFijo) {
-        arcTipo = "recta";
-        arcTipoHint.textContent = "Solo las monturas esqueleto tienen opción de arción tipo sudadera. Para el resto, solo rectas.";
-      } else {
-        arcTipoHint.textContent = "";
-      }
-      let arcDesc = `Arciones: ${arcEstilo === "doble" ? "Dobles" : "Sencillas"} - ${arcTipo === "sudadera" ? "Sudadera" : "Rectas"}`;
-      items.push({ text: arcDesc, price: 0 });
+  // CUERAJE + HERRAJE
+  const cuerajeVal = cueraje.value;
+  const cuerajeLabel = cueraje.options[cueraje.selectedIndex].textContent;
+  const herrajeVal = herrajeEstilo.value;
+  const { base, delta, especial } = getCuerajePrice(cuerajeVal, herrajeVal);
+  let herrajeGreca = form.herrajeGreca.value;
+  let argTapaDisp = ["inox_blanco", "inox_pavonado", "fierro_aluminio", "fierro_plata"].includes(herrajeVal);
+  let argTapa = argollasTapa.checked && argTapaDisp;
+  let argTapaPrecio = argTapa ? (PRECIOS.herraje?.argollas_tapa ?? 1000) : 0;
+  let detalleHerraje = `${cuerajeLabel} con Herraje: ${herrajeEstilo.options ? herrajeEstilo.options[herrajeEstilo.selectedIndex].textContent : herrajeVal} — Greca ${herrajeGreca}`;
+  if (argTapa) detalleHerraje += " — Argollas de tapa";
+  if (especialPorMedida || especial) {
+    detalleHerraje += " (trabajo especial, cotizar con artesano)";
+    items.push({ text: detalleHerraje, price: 0 });
+    trabajoEspecial = true;
+  } else {
+    items.push({ text: detalleHerraje, price: base + delta + argTapaPrecio });
+  }
+  argollasTapa.disabled = !argTapaDisp;
+  argTapaHint.textContent = argTapaDisp ? "" : "Solo disponible con herraje de acero inoxidable, fierro de aluminio o plata.";
 
-      let estribos = getSelected("estribos");
-      let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
-      let estrDesc = estribos === "tapadera" ? "Estribos de tapadera (+$1,500)" : "Estribos abiertos (incluidos)";
-      items.push({ text: estrDesc, price: estrPrice });
+  // DESCUENTO por mandar fuste
+  if (form.clienteMandaFuste.checked && !especialPorMedida) {
+    items.push({ text: "El cliente envía su fuste", price: - (PRECIOS.fuste?.descuentoClienteManda ?? 1000) });
+  }
 
-      let caronaVal = form.carona.value;
-      if (caronaVal && PRECIOS.carona && PRECIOS.carona[caronaVal] !== undefined) {
-        let price = PRECIOS.carona[caronaVal];
-        items.push({ text: `Carona (${caronaVal.replace(/_/g, ' ')})`, price });
-      }
-      let zarape = getSelected("zarape");
-      if (zarape && zarape !== "" && PRECIOS.zarape && PRECIOS.zarape[zarape] !== undefined) {
-        let price = PRECIOS.zarape[zarape];
-        items.push({ text: `Zarape ${zarape === "fino" ? "fino" : "sencillo"}`, price });
-      }
-      if (form.cincha.checked) {
-        let medida = form.cinchaMedida.value ? ` (${form.cinchaMedida.value}cm)` : "";
-        items.push({ text: "Cincha" + medida, price: PRECIOS.extras?.cincha ?? 1200 });
-      }
-      if (form.cuarta.checked) items.push({ text: "Cuarta estándar", price: PRECIOS.extras?.cuarta ?? 500 });
-      if (form.jaquima.checked) items.push({ text: "Jáquima / Bozalillo", price: PRECIOS.extras?.jaquima ?? 2800 });
-      if (form.cinturon.checked) {
-        let talla = form.cinturonTalla.value ? ` (talla ${form.cinturonTalla.value})` : "";
-        items.push({ text: "Cinturón de piel cosido a mano" + talla, price: PRECIOS.extras?.cinturon ?? 900 });
-      }
-      [
-        {id:"hebilla", label:"Hebilla del cinturón"},
-        {id:"espuelas", label:"Espuelas"},
-        {id:"machete", label:"Machete"},
-        {id:"freno", label:"Freno"},
-        {id:"cuchillo", label:"Cuchillo"}
-      ].forEach(item => {
-        if (form[item.id].checked) {
-          items.push({ text: item.label + " (trabajo especial, cotizar con artesano)", price: 0 });
-          cotizarDirecto.push(item.label);
-        }
-      });
+  // ARCIONES
+  let arcEstilo = getSelected("arcEstilo");
+  let arcTipo = getSelected("arcTipo");
+  let tipoFijo = !["esqueleto_cola_pato", "esqueleto_basto_cuadrado"].includes(cuerajeVal);
+  if (tipoFijo) {
+    arcTipo = "recta";
+    arcTipoHint.textContent = "Solo las monturas esqueleto tienen opción de arción tipo sudadera. Para el resto, solo rectas.";
+  } else {
+    arcTipoHint.textContent = "";
+  }
+  let arcDesc = `Arciones: ${arcEstilo === "doble" ? "Dobles" : "Sencillas"} - ${arcTipo === "sudadera" ? "Sudadera" : "Rectas"}`;
+  if (especialPorMedida) {
+    arcDesc += " (trabajo especial, cotizar con artesano)";
+    items.push({ text: arcDesc, price: 0 });
+  } else {
+    items.push({ text: arcDesc, price: 0 });
+  }
+
+  // ESTRIBOS
+  let estribos = getSelected("estribos");
+  let estrDesc = estribos === "tapadera" ? "Estribos de tapadera (+$1,500)" : "Estribos abiertos (incluidos)";
+  if (especialPorMedida) {
+    estrDesc += " (trabajo especial, cotizar con artesano)";
+    items.push({ text: estrDesc, price: 0 });
+  } else {
+    let estrPrice = estribos === "tapadera" ? (PRECIOS.estribos?.tapadera ?? 1500) : 0;
+    items.push({ text: estrDesc, price: estrPrice });
+  }
+
+  // EXTRAS Y TEXTILES (esto queda igual)
+  let caronaVal = form.carona.value;
+  if (caronaVal && PRECIOS.carona && PRECIOS.carona[caronaVal] !== undefined) {
+    let price = PRECIOS.carona[caronaVal];
+    items.push({ text: `Carona (${caronaVal.replace(/_/g, ' ')})`, price });
+  }
+  let zarape = getSelected("zarape");
+  if (zarape && zarape !== "" && PRECIOS.zarape && PRECIOS.zarape[zarape] !== undefined) {
+    let price = PRECIOS.zarape[zarape];
+    items.push({ text: `Zarape ${zarape === "fino" ? "fino" : "sencillo"}`, price });
+  }
+  if (form.cincha.checked) {
+    let medidaCincha = form.cinchaMedida.value ? ` (${form.cinchaMedida.value}cm)` : "";
+    items.push({ text: "Cincha" + medidaCincha, price: PRECIOS.extras?.cincha ?? 1200 });
+  }
+  if (form.cuarta.checked) items.push({ text: "Cuarta estándar", price: PRECIOS.extras?.cuarta ?? 500 });
+  if (form.jaquima.checked) items.push({ text: "Jáquima / Bozalillo", price: PRECIOS.extras?.jaquima ?? 2800 });
+  if (form.cinturon.checked) {
+    let talla = form.cinturonTalla.value ? ` (talla ${form.cinturonTalla.value})` : "";
+    items.push({ text: "Cinturón de piel cosido a mano" + talla, price: PRECIOS.extras?.cinturon ?? 900 });
+  }
+  [
+    {id:"hebilla", label:"Hebilla del cinturón"},
+    {id:"espuelas", label:"Espuelas"},
+    {id:"machete", label:"Machete"},
+    {id:"freno", label:"Freno"},
+    {id:"cuchillo", label:"Cuchillo"}
+  ].forEach(item => {
+    if (form[item.id].checked) {
+      items.push({ text: item.label + " (trabajo especial, cotizar con artesano)", price: 0 });
+      cotizarDirecto.push(item.label);
+    }
+  });
+
+  // Actualizar el resto de la UI (igual que antes)
+  detalleLista.innerHTML = items.map(it => {
+    let precioTexto = "";
+    if ((trabajoEspecial || especialPorMedida) && it.price === 0 && it.text.includes("trabajo especial")) precioTexto = "trabajo especial";
+    else if (it.price === 0) precioTexto = "Incluido";
+    else precioTexto = money(it.price);
+    return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
+  }).join("");
+  total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
+  precioTotalEl.textContent = money(total);
+
+  // WhatsApp
+  const phone = '529515576911';
+  let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
+    ? (it.price === 0 ? "Incluido" : money(it.price))
+    : it.price}`).join('\n');
+  let text = encodeURIComponent(
+    `Hola, te comparto la cotización:\n\n${resumenTxt}\n\nTotal: ${money(total)}\n\n${cotizarDirecto.length ? 'Requiere cotización directa de: ' + cotizarDirecto.join(', ') : ''}`
+  );
+  btnWhats.href = `https://wa.me/${phone}?text=${text}`;
+}
 
   detalleLista.innerHTML = items.map(it => {
   let precioTexto = "";
