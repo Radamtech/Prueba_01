@@ -39,6 +39,130 @@
       font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 14px;
       letter-spacing: .3px;
     }
+    #trabajosSidebar {
+  position: fixed;
+  left: 0;
+  top: 30%;
+  z-index: 1000;
+  background: linear-gradient(120deg, #ffedd5 70%, #ffecc4 100%);
+  border-top-right-radius: 14px;
+  border-bottom-right-radius: 14px;
+  box-shadow: 2px 4px 18px #eab30833;
+  padding: 0;
+  cursor: pointer;
+  transition: box-shadow .18s;
+}
+#trabajosSidebar:hover {
+  box-shadow: 0 0 0 4px #eab30844, 2px 4px 22px #f59e0b44;
+}
+#trabajosSidebar span {
+  display: block;
+  padding: 18px 12px 18px 16px;
+  font-weight: 900;
+  color: #c2410c;
+  letter-spacing: .06em;
+  font-size: 1.09rem;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  user-select: none;
+}
+
+/* Modal galería */
+#galeriaModal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(31,41,55,0.82);
+  align-items: center;
+  justify-content: center;
+  animation: fadeInGaleria .3s;
+}
+@keyframes fadeInGaleria { from { opacity: 0; } to { opacity: 1; } }
+#galeriaModal[open] { display: flex; }
+
+#galeriaCarrusel {
+  position: relative;
+  background: #fffbeed9;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px #eab30855, 0 1px 8px #fff4;
+  max-width: 96vw;
+  max-height: 94vh;
+  min-width: 310px;
+  min-height: 220px;
+  padding: 34px 24px 28px 24px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-direction: row;
+  justify-content: center;
+  overflow: visible;
+}
+
+#galeriaCarrusel img {
+  max-width: 480px;
+  max-height: 65vh;
+  border-radius: 13px;
+  box-shadow: 0 2px 16px #c2410c22;
+  border: 2.5px solid #ffecc4;
+  background: #fff;
+  transition: transform .14s, box-shadow .14s;
+  margin: 0 28px;
+  object-fit: contain;
+  background: #fffbeed9;
+}
+#galeriaCarrusel img:active {
+  transform: scale(1.04);
+}
+
+#closeGaleria {
+  position: absolute;
+  top: 10px; right: 16px;
+  background: #fff7eddd;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.7em;
+  color: #c2410c;
+  font-weight: 900;
+  padding: 3px 16px 5px 16px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 1px 8px #eab30833;
+  transition: background .11s;
+}
+#closeGaleria:hover { background: #ffecc4; color: #b91c1c;}
+.carruselArrow {
+  background: #ffecc4cc;
+  border: none;
+  border-radius: 50%;
+  font-size: 2.3em;
+  color: #c2410c;
+  width: 48px; height: 48px;
+  cursor: pointer;
+  position: relative;
+  z-index: 5;
+  box-shadow: 0 1px 8px #eab30833;
+  margin: 0 8px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .12s, color .13s;
+}
+.carruselArrow:hover { background: #fae794; color: #b91c1c;}
+#carruselIndicador {
+  position: absolute;
+  bottom: 10px; left: 0; right: 0;
+  text-align: center;
+  color: #c2410c;
+  font-weight: 700;
+  letter-spacing: .1em;
+  font-size: 1.07em;
+  user-select: none;
+}
+@media (max-width: 740px) {
+  #galeriaCarrusel img { max-width: 90vw; max-height: 44vw; margin: 0 10px;}
+  #galeriaCarrusel { padding: 18px 2px 16px 2px; min-width: 0;}
+  .carruselArrow { font-size: 1.4em; width: 38px; height: 38px;}
+}
     .site-header .brand .logo {
       background: linear-gradient(135deg, #fff, #ffecc4); color: var(--primary);
       width: 44px; height: 44px; display: grid; place-items: center;
@@ -216,6 +340,21 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- Sidebar para galería -->
+<div id="trabajosSidebar" title="Ver algunos trabajos">
+  <span>Algunos de Nuestros trabajos</span>
+</div>
+
+<!-- Modal y Carrusel de galería -->
+<div id="galeriaModal">
+  <div id="galeriaCarrusel">
+    <button id="carruselNext" class="carruselArrow" title="Siguiente">&#10095;</button>
+    <div ton id="closeGaleria" title="Cerrar galería">&times;</button>
+    <button id="carruselPrev" class="carruselArrow" title="Anterior">&#10094;</button>
+    <img id="carruselImg" src="" alt="Foto de trabajo" />
+    <butid="carruselIndicador"></div>
+  </div>
+</div>
   <header class="site-header">
     <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
       <div class="brand"><span class="logo">JP</span> Caballo Charro: Una Historia de México</div>
@@ -752,6 +891,58 @@
 
     loadPrices();
     setInterval(setQuoteDate, 60000);
+
+/* ---- Carrusel de trabajos ---- */
+const imagenesTrabajos = [
+  "trabajo1.jpg",
+  "trabajo2.jpg",
+  "trabajo3.jpg",
+  "trabajo4.jpg",
+  "trabajo5.jpg"
+  // Agrega aquí más nombres si tienes más imágenes en /imagenes/
+];
+let carruselIndex = 0;
+const galeriaSidebar = document.getElementById('trabajosSidebar');
+const galeriaModal = document.getElementById('galeriaModal');
+const galeriaCarrusel = document.getElementById('galeriaCarrusel');
+const carruselImg = document.getElementById('carruselImg');
+const carruselPrev = document.getElementById('carruselPrev');
+const carruselNext = document.getElementById('carruselNext');
+const closeGaleriaBtn = document.getElementById('closeGaleria');
+const carruselIndicador = document.getElementById('carruselIndicador');
+
+function mostrarImagenCarrusel(idx) {
+  if (imagenesTrabajos.length === 0) return;
+  carruselIndex = ((idx % imagenesTrabajos.length) + imagenesTrabajos.length) % imagenesTrabajos.length;
+  carruselImg.src = `./imagenes/${imagenesTrabajos[carruselIndex]}`;
+  carruselImg.alt = `Trabajo ${carruselIndex + 1}`;
+  carruselIndicador.textContent = `Foto ${carruselIndex + 1} de ${imagenesTrabajos.length}`;
+}
+
+galeriaSidebar.addEventListener('click', () => {
+  mostrarImagenCarrusel(0);
+  galeriaModal.setAttribute('open', '');
+});
+closeGaleriaBtn.addEventListener('click', () => galeriaModal.removeAttribute('open'));
+carruselPrev.addEventListener('click', e => {
+  e.stopPropagation();
+  mostrarImagenCarrusel(carruselIndex - 1);
+});
+carruselNext.addEventListener('click', e => {
+  e.stopPropagation();
+  mostrarImagenCarrusel(carruselIndex + 1);
+});
+galeriaModal.addEventListener('click', e => {
+  if (e.target === galeriaModal) galeriaModal.removeAttribute('open');
+});
+document.addEventListener('keydown', e => {
+  if (!galeriaModal.hasAttribute('open')) return;
+  if (e.key === 'Escape') galeriaModal.removeAttribute('open');
+  if (e.key === 'ArrowLeft') mostrarImagenCarrusel(carruselIndex - 1);
+  if (e.key === 'ArrowRight') mostrarImagenCarrusel(carruselIndex + 1);
+});
+// Zoom a imagen nueva pestaña
+carruselImg.onclick = () => window.open(carruselImg.src, "_blank");
 </script>
 </body>
 </html>
