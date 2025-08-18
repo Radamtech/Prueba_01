@@ -39,6 +39,96 @@
       font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 14px;
       letter-spacing: .3px;
     }
+.main-nav .nav-sections {
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:flex;
+  gap:28px;
+  align-items:center;
+}
+
+.main-nav .nav-sections > li {
+  position:relative;
+  font-weight:700;
+  font-size:1.03em;
+}
+
+.main-nav .nav-sections > li > a,
+.main-nav .nav-sections > li > span {
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+  padding-bottom:4px;
+  border-bottom:2px solid transparent;
+  transition:all 160ms;
+  opacity:.95;
+}
+.main-nav .nav-sections > li > a:hover,
+.main-nav .nav-sections > li > span:hover {
+  border-bottom:2px solid var(--accent);
+  color:#fef9c3;
+  opacity:1;
+  filter:drop-shadow(0 0 6px #ffe06677);
+}
+
+.has-dropdown:hover > .dropdown,
+.has-dropdown:focus-within > .dropdown {
+  display:block;
+}
+
+.has-dropdown > .dropdown {
+  display:none;
+  position:absolute;
+  top:100%;
+  left:0;
+  min-width:160px;
+  padding:10px 0;
+  background:linear-gradient(90deg, #fffbeed9 80%, #ffecc4ee 100%);
+  box-shadow:0 3px 12px #eab30844, 0 1px 5px #fff4;
+  border-radius:10px;
+  z-index:100;
+}
+
+.has-dropdown > .dropdown li {
+  display:block;
+  padding:0;
+}
+
+.has-dropdown > .dropdown li a {
+  color:var(--primary);
+  text-decoration:none;
+  display:block;
+  padding:8px 20px;
+  border-radius:7px;
+  font-weight:600;
+  font-size:1em;
+  transition:background .14s, color .13s;
+}
+.has-dropdown > .dropdown li a:hover {
+  background:var(--accent);
+  color:#fff;
+}
+
+/* Responsive nav (opcional, mejora en móviles) */
+@media (max-width: 700px) {
+  .main-nav .nav-sections {
+    flex-direction:column;
+    gap:0;
+    background:#fffbeed9;
+    position:fixed;
+    right:0; top:70px;
+    width:210px;
+    box-shadow: -4px 2px 18px #eab30833;
+    border-radius:0 0 0 18px;
+    padding:12px 0 20px 0;
+    z-index:999;
+    display:none; /* Puedes poner un menú hamburguesa si quieres */
+  }
+  .main-nav .nav-sections > li {
+    margin-bottom:10px;
+  }
+}
 #trabajosSidebar {
   position: fixed;
   right: 0; /* Cambiado de left: 0; a right: 0; */
@@ -357,22 +447,37 @@
     <div id="carruselIndicador"></div>
   </div>
 </div>
-  <header class="site-header">
-<div class="brand">
-  <span class="logo" style="padding:0;">
-    <img src="./imagenes/logo.jpg" alt="Logo" style="width:44px;height:44px;object-fit:contain;border-radius:12px;display:block;" />
-  </span>
-  Caballo Charro: Una Historia de México
-</div>
-      <nav>
-        <a href="#montura">Montura</a>
-        <a href="#extras">Extras</a>
-        <a href="#total">Total</a>
-        <a href="misionyvision.html">Misión y Visión</a>
-        <a href="redes.html">Redes</a>
-      </nav>
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+    <div class="brand">
+      <span class="logo" style="padding:0;">
+        <img src="./imagenes/logo.jpg" alt="Logo" style="width:44px;height:44px;object-fit:contain;border-radius:12px;display:block;" />
+      </span>
+      Caballo Charro: Una Historia de México
     </div>
-  </header>
+    <nav class="main-nav">
+      <ul class="nav-sections">
+        <!-- Sección 1: Cotización -->
+        <li class="has-dropdown">
+          <span>Cotización</span>
+          <ul class="dropdown">
+            <li><a href="#montura">Montura</a></li>
+            <li><a href="#extras">Extras</a></li>
+            <li><a href="#total">Total</a></li>
+          </ul>
+        </li>
+        <!-- Sección 2: Misión y Visión -->
+        <li>
+          <a href="misionyvision.html">Misión y Visión</a>
+        </li>
+        <!-- Sección 3: Redes -->
+        <li>
+          <a href="redes.html">Redes</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header>
   <main class="container">
     <form id="cotizadorForm" autocomplete="off">
       <div class="card" id="montura">
