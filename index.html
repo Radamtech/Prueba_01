@@ -721,15 +721,20 @@
         }
       });
 
-      detalleLista.innerHTML = items.map(it => {
-        let precioTexto = "";
-        if (trabajoEspecial && it.price === 0) precioTexto = "trabajo especial";
-        else if (it.price === 0) precioTexto = "Incluido";
-        else precioTexto = money(it.price);
-        return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
-      }).join("");
-      total = items.reduce((s, it) => s + (typeof it.price === "number" ? it.price : 0), 0);
-      precioTotalEl.textContent = money(total);
+  detalleLista.innerHTML = items.map(it => {
+  let precioTexto = "";
+  // Si el texto del item contiene "trabajo especial" o tiene la propiedad especial, muestra "Trabajo Especial"
+  if ((it.text && it.text.toLowerCase().includes("trabajo especial")) || (typeof it.especial !== "undefined" && it.especial)) {
+    precioTexto = "Trabajo Especial";
+  }
+  else if (it.price === 0) {
+    precioTexto = "Incluido";
+  }
+  else {
+    precioTexto = money(it.price);
+  }
+  return `<li><span>${it.text}</span><strong>${precioTexto}</strong></li>`;
+}).join("");
 //                  Numero de contacto a donde se envia la cotización            //
       const phone = '529515576911';
       let resumenTxt = items.map(it => `${it.text}: ${typeof it.price === "number"
@@ -956,6 +961,8 @@ document.addEventListener('keydown', e => {
 });
 // Zoom a imagen nueva pestaña
 carruselImg.onclick = () => window.open(carruselImg.src, "_blank");
+
+
 </script>
 </body>
 </html>
