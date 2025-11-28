@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cotizador de Monturas</title>
-  <link rel="icon" href="../imagenes/logo.png" type="image/png" />
+  <link rel="icon" type="image/png" href="/imagenes/logo.png" />
   <meta name="description" content="Cotizador de monturas ecuestres con extras. Descarga tu cotización en PDF o PNG y compártela por WhatsApp." />
   <style>
     :root {
@@ -433,12 +433,10 @@
   <link href="https://fonts.googleapis.com/css?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
 </head>
 <body>
-<!-- Sidebar para galería (DERECHA) -->
 <div id="trabajosSidebar" title="Ver algunos trabajos">
   <span>Algunos de Nuestros trabajos</span>
 </div>
 
-<!-- Modal y Carrusel de galería (CORRECTO) -->
 <div id="galeriaModal">
   <div id="galeriaCarrusel">
     <button id="closeGaleria" title="Cerrar galería">&times;</button>
@@ -458,7 +456,6 @@
     </div>
     <nav class="main-nav">
       <ul class="nav-sections">
-        <!-- Sección 1: Cotización -->
         <li class="has-dropdown">
           <span>Cotización</span>
           <ul class="dropdown">
@@ -467,11 +464,9 @@
             <li><a href="#total">Total</a></li>
           </ul>
         </li>
-        <!-- Sección 2: Misión y Visión -->
         <li>
           <a href="misionyvision.html">Misión y Visión</a>
         </li>
-        <!-- Sección 3: Redes -->
         <li>
           <a href="redes.html">Redes</a>
         </li>
@@ -1067,7 +1062,6 @@ const imagenesTrabajos = [
   "7.png",
   "8.png",
   "9.png",
-  // Agrega aquí más nombres si tienes más imágenes en /imagenes/
 ];
 let carruselIndex = 0;
 const galeriaSidebar = document.getElementById('trabajosSidebar');
@@ -1109,7 +1103,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') mostrarImagenCarrusel(carruselIndex - 1);
   if (e.key === 'ArrowRight') mostrarImagenCarrusel(carruselIndex + 1);
 });
-// Zoom a imagen nueva pestaña
 carruselImg.onclick = () => window.open(carruselImg.src, "_blank");
 
 
