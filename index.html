@@ -34,8 +34,7 @@
       box-shadow: 0 4px 20px 0 #eab30855;
       position: sticky; top: 0; z-index: 20;
       animation: headerFadeIn .9s cubic-bezier(.9,.12,.23,1.22);
-      display: flex;
-flex-direction: row;
+
     }
     @keyframes headerFadeIn { from { opacity: 0; transform: translateY(-30px);} to { opacity: 1; transform: none;}}
     .site-header .brand {
@@ -79,6 +78,9 @@ flex-direction: row;
 .has-dropdown:focus-within > .dropdown {
   display:block;
 }
+
+
+
  @media (max-width: 650px) {
        
 
@@ -87,6 +89,9 @@ flex-direction: row;
 font-size: 1rem;
 display: flex;
 flex-direction: column;
+min-width: 100%;
+pagging: 0px;
+
 
 }
 .container{
@@ -105,8 +110,6 @@ place-items: center;
 justify-items: center;
 align-items: center;
 place-items: center;
-  margin: auto auto;
-  margin-top: auto;
   
     width: 100%;
 
@@ -116,28 +119,75 @@ place-items: center;
 p{
 
 font-size: 0.9rem;
+
+
+}
+nav{
+display:flex;
+flex-direction: row;
+flex-wrap: nowrap;  	
+justify-content: space-between;
+
+
 }
 
   .headernav{
 
 font-size: 0.7rem;
+
     
   }
+nav a{
+margin-right: 0;
+justify-content: center;
+margin-top: 10px;
+
+
+
+}
+nav {
+display:flex;
+flex-direction: row;
+justify-content: center;
+min-width: 100%;
+margin: auto auto;
+gap: 0px;
+}
 
   }
-    .container{
 
-    width: 50%;
-      
-    }
-    .centrado{
-      
+
+    .site-header{
+	display: flex;
+ 	align-items: center;
+  	justify-content: space-between;
+    width: 100%;
+    }    
+nav{
+display:flex;
+flex-direction: row;
+flex-wrap: nowrap;  	
+justify-content: space-between;
+min-width: 100%;
+margin: auto auto;
+gap: 0;
+
+
+}
+nav a{
+
 font-size: 1.2rem;
-justify-items: center;
-align-items: center;
+width: auto;
+justify-content: space-between;
 place-items: center;
-    width: 50%;
-    }
+margin: auto;
+margin-right: 40px;
+
+
+}
+
+
+
 .has-dropdown > .dropdown {
   display:none;
   position:absolute;
