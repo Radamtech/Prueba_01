@@ -38,6 +38,105 @@
       position: sticky; top: 0; z-index: 20;
       animation: headerFadeIn .9s cubic-bezier(.9,.12,.23,1.22);
     }
+
+
+ @media (max-width: 650px) {
+       
+
+
+.site-header{
+font-size: 1rem;
+display: flex;
+flex-direction: column;
+min-width: 100%;
+pagging: 0px;
+gap: 20px;
+
+
+}
+.container{
+
+justify-items: center;
+align-items: center;
+place-items: center;
+  
+    width: 100%;
+
+
+}
+
+.centrado{
+
+justify-items: center;
+align-items: center;
+place-items: center;
+  
+    width: 100%;
+
+
+}
+      
+p{
+
+font-size: 1rem;
+
+
+}
+nav{
+display:flex;
+flex-direction: row;
+flex-wrap: nowrap;  	
+justify-content: space-between;
+margin: auto;
+
+
+}
+
+  .headernav{
+
+font-size: 0.7rem;
+
+    
+  }
+nav a{
+
+justify-content: center;
+margin: auto;
+
+}
+
+  }
+    .site-header{
+	display: flex;
+ 	align-items: center;
+  	justify-content: space-between;
+    width: 100%;
+gap: 20px;
+    }    
+nav{
+display:flex;
+flex-direction: row;
+flex-wrap: nowrap;  	
+justify-content: space-between;
+min-width: auto;
+margin: auto auto;
+gap: 0;
+
+
+}
+nav a{
+
+font-size: 1.2rem;
+width: auto;
+justify-content: space-between;
+place-items: center;
+
+margin-right: 40px;
+
+
+}
+
+    
     @keyframes headerFadeIn { from { opacity: 0; transform: translateY(-30px);} to { opacity: 1; transform: none;}}
     .site-header .brand {
       font-size: 1.4rem; font-weight: 900; display: flex; align-items: center; gap: 14px;
@@ -203,19 +302,35 @@
 </head>
 <body>
   <header class="site-header">
-    <div class="container" style="display:flex;align-items:center;justify-content:space-between;">
+
+    <div class="container">
+
     <div class="brand">
+
       <span class="logo" style="padding:0;">
+
         <img src="./imagenes/logo.png" alt="Logo" style="width:35px;height:35px;justify-items:center;aling-items:center;object-fit:contain;border-radius:12px;display:block;" />
+
       </span>
-      Caballo Charro: Una Historia de México
+
+      <p>Caballo Charro: Una Historia de México</p>
+
     </div>
+</div>
+<div class="centrado">
+
       <nav>
-        <a href="index.html">Inicio</a>
-        <a href="misionyvision.html">Misión y Visión</a>
-        <a href="redes.html">Redes</a>
+
+        <a class="headernav" href="index.html">Total</a>
+
+        <a class="headernav" href="misionyvision.html">Misión y Visión</a>
+
+        <a class="headernav" href="redes.html">Redes</a>
+
       </nav>
+
     </div>
+
   </header>
   <main class="container">
     <section class="hero">
